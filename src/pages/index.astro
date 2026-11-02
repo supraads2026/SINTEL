@@ -17,33 +17,66 @@ const why = [
   { icon: 'phone', t: 'One call or WhatsApp away', d: 'Reach us the way that suits you, and we will call you back.' },
 ];
 const featured = properties.slice(0, 3);
+
+// Rotating hero: one 8-second video per slide, in story order (group → finance → bridge → property → brand).
+// Every word is live HTML; the videos carry no text.
+const slides = [
+  { vid: 'vid-01-home-hero', w: 1920, eyebrow: 'Finance · Real Estate · Bhubaneswar', t1: 'Two companies.', t2: 'One trusted group.',
+    btns: [{ t: 'Explore Dwarika Finserv', href: '/dwarika-finserv/', gold: true }, { t: 'Explore Dwarika Venture', href: '/dwarika-venture/' }] },
+  { vid: 'hs-2-finserv', w: 1280, eyebrow: 'Dwarika Finserv', t1: 'Funding for', t2: 'every goal.',
+    btns: [{ t: 'Explore loans', href: '/dwarika-finserv/', gold: true }, { t: 'Talk to an expert', href: '/contact/#enquire' }] },
+  { vid: 'hs-5-bridge', w: 1280, eyebrow: 'SINTEL Enterprises', t1: 'Funding and property,', t2: 'connected.',
+    btns: [{ t: 'Home loans', href: '/dwarika-finserv/home-loan/', gold: true }, { t: 'Find a property', href: '/dwarika-venture/' }] },
+  { vid: 'hs-3-venture', w: 1280, eyebrow: 'Dwarika Venture', t1: 'Find the right', t2: 'property.',
+    btns: [{ t: 'View properties', href: '/dwarika-venture/', gold: true }, { t: 'Sell your property', href: '/dwarika-venture/sell-your-property/' }] },
+  { vid: 'hs-4-towers', w: 1280, eyebrow: 'SINTEL Enterprises', t1: 'Building opportunities.', t2: 'Enabling growth.',
+    btns: [{ t: 'About SINTEL', href: '/about/', gold: true }, { t: 'Enquire', href: '/contact/#enquire' }] },
+];
 ---
 <Base
   title="SINTEL Enterprises | Loans & Property in Bhubaneswar"
   description="SINTEL Enterprises brings Dwarika Finserv (loans and funding) and Dwarika Venture (property sales) together under one trusted group in Bhubaneswar, Odisha."
   pageName="Home"
 >
-  <!-- 1 · Hero -->
-  <section class="hero hero-home" aria-label="Introduction">
+  <!-- 1 · Hero: rotating slider -->
+  <section class="hero hero-home" aria-roledescription="carousel" aria-label="SINTEL Enterprises" data-hero-slider>
     <div class="hero-media">
       <div class="stage">
-        <img class="poster" src={m('img/vid-01-home-hero-poster.webp')} srcset={`${m('img/vid-01-home-hero-poster-m.webp')} 960w, ${m('img/vid-01-home-hero-poster.webp')} 1920w`} sizes="100vw" alt="" width="1920" height="1080" fetchpriority="high" />
-        <video data-hero-video muted playsinline loop preload="none" poster={m('img/vid-01-home-hero-poster.webp')} aria-hidden="true">
-          <source src={m('video/vid-01-home-hero-m.mp4')} type="video/mp4" media="(max-width: 900px)" /><source src={m('video/vid-01-home-hero.mp4')} type="video/mp4" />
-        </video>
-        <a class="island-tag" href={u('/dwarika-finserv/')} style="left:17%;top:40%;--tilt:-8deg">Dwarika Finserv<span class="pulse"></span></a>
-        <a class="island-tag" href={u('/dwarika-venture/')} style="left:84%;top:40%;--tilt:8deg">Dwarika Venture<span class="pulse"></span></a>
+        {slides.map((sl, i) => (
+          <div class:list={['hs-media', { 'is-active': i === 0 }]} data-i={i}>
+            <img class="poster" src={m(`img/${sl.vid}-poster.webp`)} srcset={`${m(`img/${sl.vid}-poster-m.webp`)} 960w, ${m(`img/${sl.vid}-poster.webp`)} ${sl.w}w`} sizes="100vw" alt="" width={sl.w} height={sl.w * 9 / 16} fetchpriority={i === 0 ? 'high' : undefined} loading={i === 0 ? undefined : 'lazy'} />
+            <video muted playsinline preload="none" aria-hidden="true" data-src={m(`video/${sl.vid}.mp4`)} data-src-m={m(`video/${sl.vid}-m.mp4`)}></video>
+            {i === 0 && <>
+              <a class="island-tag" href={u('/dwarika-finserv/')} style="left:17%;top:40%;--tilt:-8deg">Dwarika Finserv<span class="pulse"></span></a>
+              <a class="island-tag" href={u('/dwarika-venture/')} style="left:84%;top:40%;--tilt:8deg">Dwarika Venture<span class="pulse"></span></a>
+            </>}
+          </div>
+        ))}
       </div>
+      <div class="hs-shimmer" aria-hidden="true"></div>
     </div>
     <div class="wrap hero-content">
-      <div>
-        <p class="eyebrow" data-hero-in>Finance · Real Estate · Bhubaneswar</p>
-        <h1><span class="line"><span>Two companies.</span></span><span class="line"><span><em>One trusted group.</em></span></span></h1>
-      </div>
-      <div class="btns" data-hero-in>
-        <a class="btn btn-gold magnetic" href={u('/dwarika-finserv/')}>Explore Dwarika Finserv <Icon name="arrow" class="chev arr" /></a>
-        <a class="btn magnetic" href={u('/dwarika-venture/')}>Explore Dwarika Venture <Icon name="arrow" class="chev arr" /></a>
-      </div>
+      {slides.map((sl, i) => (
+        <div class:list={['hs-copy', { 'is-active': i === 0 }]} data-i={i} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${slides.length}`} inert={i !== 0}>
+          <div>
+            <p class="eyebrow" data-hero-in={i === 0 ? '' : undefined}>{sl.eyebrow}</p>
+            {i === 0
+              ? <h1><span class="line"><span>{sl.t1}</span></span> <span class="line"><span><em>{sl.t2}</em></span></span></h1>
+              : <h2 class="hs-h"><span class="line"><span>{sl.t1}</span></span> <span class="line"><span><em>{sl.t2}</em></span></span></h2>}
+          </div>
+          <div class="btns" data-hero-in={i === 0 ? '' : undefined}>
+            {sl.btns.map((bt) => (
+              <a class:list={['btn', 'magnetic', { 'btn-gold': bt.gold }]} href={u(bt.href)}>{bt.t} <Icon name="arrow" class="chev arr" /></a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+    <div class="hs-ctrl">
+      <button class="hs-pause" type="button" aria-label="Pause slideshow" aria-pressed="false"><span></span></button>
+      {slides.map((sl, i) => (
+        <button class:list={['hs-dot', { 'is-active': i === 0 }]} type="button" data-go={i} aria-label={`Slide ${i + 1}: ${sl.t1} ${sl.t2}`} aria-current={i === 0 ? 'true' : undefined}><i></i></button>
+      ))}
     </div>
     <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
   </section>

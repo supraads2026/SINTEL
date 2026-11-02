@@ -112,6 +112,7 @@ document.addEventListener('astro:page-load', async () => {
 
   if (firstLoad) { firstLoad = false; await runPreloader(); }
   else curtainOut();
+  initHeroSlider();
 
   if (!motion()) {
     gsap.set('[data-reveal], [data-hero-in], .line > span', { clearProps: 'all', opacity: 1 });
@@ -434,5 +435,124 @@ function initToc() {
       t.querySelector('details')?.setAttribute('open', '');
       lenis ? lenis.scrollTo(t, { offset: -100 }) : t.scrollIntoView({ behavior: 'smooth' });
     });
+  });
+}
+
+// ───────────────── Home hero slider ─────────────────
+// Each slide's video plays once, then cross-fades (with a gold shimmer) into the next.
+// Only the current and next videos are loaded; phones get the 960px files.
+function initHeroSlider() {
+  const hero = document.querySelector<HTMLElement>('[data-hero-slider]');
+  if (!hero) return;
+  const media = [...hero.querySelectorAll<HTMLElement>('.hs-media')];
+  const copies = [...hero.querySelectorAll<HTMLElement>('.hs-copy')];
+  const dots = [...hero.querySelectorAll<HTMLButtonElement>('.hs-dot')];
+  const pauseBtn = hero.querySelector<HTMLButtonElement>('.hs-pause')!;
+  const shimmer = hero.querySelector<HTMLElement>('.hs-shimmer');
+  const n = media.length;
+  const animate = motion();
+  const small = window.matchMedia('(max-width: 900px)').matches;
+  let cur = 0, paused = false, inView = true, busy = false, started = false;
+  let raf = 0, timer = 0;
+
+  const vid = (i: number) => media[i].querySelector('video')!;
+  const load = (i: number) => {
+    const v = vid(i);
+    if (!v.getAttribute('src')) { v.src = (small ? v.dataset.srcM : v.dataset.src) || ''; v.preload = 'auto'; }
+    return v;
+  };
+  const setDot = (i: number, p: number) => dots[i].querySelector('i')!.style.setProperty('--p', String(p));
+  const running = () => animate && started && !paused && inView && !document.hidden;
+
+  const play = () => {
+    if (!running()) return;
+    const v = load(cur);
+    clearTimeout(timer);
+    v.play().then(() => {
+      v.classList.add('playing');
+      load((cur + 1) % n); // warm up the next slide
+    }).catch(() => { timer = window.setTimeout(() => go(cur + 1), 8000); });
+  };
+  const stop = () => { clearTimeout(timer); vid(cur).pause(); };
+
+  media.forEach((m, i) => {
+    vid(i).addEventListener('ended', () => {
+      if (i !== cur) return;
+      setDot(i, 1);
+      if (running()) timer = window.setTimeout(() => go(cur + 1), 500); // hold the calm last frame a moment
+    });
+  });
+
+  const tick = () => {
+    const v = vid(cur);
+    if (v.duration && !v.ended) setDot(cur, Math.min(1, v.currentTime / v.duration));
+    raf = requestAnimationFrame(tick);
+  };
+
+  function go(target: number) {
+    const i = ((target % n) + n) % n;
+    if (busy || i === cur) return;
+    busy = true;
+    clearTimeout(timer);
+    const prev = cur;
+    cur = i;
+    const pv = vid(prev);
+    const nv = load(i);
+    try { nv.currentTime = 0; } catch {}
+
+    media[i].classList.add('is-active');
+    copies[prev].classList.remove('is-active'); copies[prev].inert = true;
+    copies[i].classList.add('is-active'); copies[i].inert = false;
+    dots.forEach((d, k) => {
+      d.classList.toggle('is-active', k === i);
+      if (k === i) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+      setDot(k, k < i ? 1 : 0);
+    });
+
+    let finished = false;
+    const done = () => {
+      if (finished) return;
+      finished = true;
+      gsap.set(media[prev], { opacity: 0 }); gsap.set(media[i], { opacity: 1 });
+      media[prev].classList.remove('is-active'); pv.pause(); pv.classList.remove('playing'); busy = false;
+    };
+    window.setTimeout(done, 1300); // never wait on the fade: a throttled tab must not lock the slider
+    if (!animate) { gsap.set(media[i], { opacity: 1 }); gsap.set(media[prev], { opacity: 0 }); done(); return; }
+
+    gsap.fromTo(media[i], { opacity: 0 }, { opacity: 1, duration: 1.1, ease: 'power2.inOut' });
+    gsap.to(media[prev], { opacity: 0, duration: 1.1, ease: 'power2.inOut', onComplete: done });
+    if (shimmer) gsap.fromTo(shimmer, { opacity: 1, backgroundPosition: '120% 0' }, { backgroundPosition: '-20% 0', duration: 1.3, ease: 'power2.inOut', onComplete: () => { gsap.set(shimmer, { opacity: 0 }); } });
+    gsap.fromTo(copies[i].querySelectorAll('.line > span'), { yPercent: 115 }, { yPercent: 0, duration: 1, ease: 'expo.out', stagger: 0.1, delay: 0.25 });
+    gsap.fromTo(copies[i].querySelectorAll('.eyebrow, .btns'), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08, delay: 0.35 });
+    play();
+  }
+
+  dots.forEach((d, k) => d.addEventListener('click', () => go(k)));
+
+  pauseBtn.addEventListener('click', () => {
+    paused = !paused;
+    pauseBtn.setAttribute('aria-pressed', String(paused));
+    pauseBtn.setAttribute('aria-label', paused ? 'Play slideshow' : 'Pause slideshow');
+    if (paused) stop(); else play();
+  });
+
+  const io = new IntersectionObserver(([e]) => { inView = e.isIntersecting; if (inView) play(); else stop(); }, { threshold: 0.15 });
+  io.observe(hero);
+  const onVis = () => (document.hidden ? stop() : play());
+  document.addEventListener('visibilitychange', onVis);
+
+  if (animate) {
+    raf = requestAnimationFrame(tick);
+    whenIdle(() => { started = true; play(); });
+  } else {
+    pauseBtn.hidden = true; // nothing moves on its own: the bars become a manual slideshow
+  }
+
+  cleanups.push(() => {
+    cancelAnimationFrame(raf);
+    clearTimeout(timer);
+    io.disconnect();
+    document.removeEventListener('visibilitychange', onVis);
+    media.forEach((_, i) => vid(i).pause());
   });
 }
