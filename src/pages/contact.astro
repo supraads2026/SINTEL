@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import Enquiry from '../components/Enquiry.astro';
+import { m } from '../lib/url';
+import { site } from '../data/site';
+const schema = [{ '@context': 'https://schema.org', '@type': 'LocalBusiness', name: site.legalName, telephone: site.phoneHref, email: site.email,
+  address: { '@type': 'PostalAddress', streetAddress: site.addressLines[0], addressLocality: site.city, addressRegion: site.region, addressCountry: 'IN' }, image: new URL(m('og.jpg'), Astro.site).href }];
+const cards = [
+  { icon: 'pin', t: 'Office', v: site.addressLines.join(', '), todo: true },
+  { icon: 'phone', t: 'Phone', v: site.phone, href: `tel:${site.phoneHref}` },
+  { icon: 'wa', t: 'WhatsApp', v: site.phone, href: `https://wa.me/${site.whatsapp}` },
+  { icon: 'mail', t: 'Email', v: site.email, href: `mailto:${site.email}`, todo: site.email.includes('example') },
+  { icon: 'clock', t: 'Hours', v: site.hours, todo: true },
+];
+---
+<Base title="Contact SINTEL Enterprises | Lewis Road, Bhubaneswar" description="Contact SINTEL Enterprises, Dwarika Finserv and Dwarika Venture on Lewis Road, Bhubaneswar. Call, WhatsApp or send an enquiry." pageName="Contact" schema={schema}>
+  <PageHero eyebrow="Contact" h1={["Let's", 'talk.']} lead="Call, WhatsApp or send an enquiry. We'll get back to you soon." img="img-07-contact-pin" wide>
+    <div class="btns">
+      <a class="btn btn-gold magnetic" href="#enquire">Send an enquiry <Icon name="arrow" class="chev arr" /></a>
+      <a class="btn" href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a>
+    </div>
+  </PageHero>
+
+  <section class="section ivory">
+    <div class="wrap">
+      <h2 class="sr-only">Contact details</h2>
+      <div class="cards">
+        {cards.map((c) => (
+          <div class="card" data-reveal>
+            <span class="icon"><Icon name={c.icon} /></span>
+            <h3>{c.t}</h3>
+            <p>{c.href ? <a href={c.href} target={c.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{c.v}</a> : c.v}</p>
+            {c.todo && <p style="margin-top:8px"><mark class="todo">To confirm</mark></p>}
+          </div>
+        ))}
+      </div>
+      <div class="map-load mt-3" data-map={site.mapQuery} style={`background-image:linear-gradient(rgba(5,42,31,.55),rgba(5,42,31,.55)),url(${m('img/img-06-plot-map-sm.webp')})`}>
+        <button class="btn btn-gold" type="button"><Icon name="map" class="chev" /> Show on Google Maps</button>
+      </div>
+    </div>
+  </section>
+
+  <Enquiry />
+</Base>

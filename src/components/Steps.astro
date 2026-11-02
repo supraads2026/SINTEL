@@ -1,0 +1,13 @@
+---
+interface Props { steps: { t: string; d?: string }[] }
+const { steps } = Astro.props;
+---
+<div class="steps">
+  {steps.map((s, i) => (
+    <div class="step" data-reveal>
+      <span class="num">{String(i + 1).padStart(2, '0')}</span>
+      <h3>{s.t}</h3>
+      {s.d && <p class="muted">{s.d}</p>}
+    </div>
+  ))}
+</div>

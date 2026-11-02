@@ -1,0 +1,68 @@
+---
+import Mark from './Mark.astro';
+import Icon from './Icon.astro';
+import { u, m } from '../lib/url';
+import { loans } from '../data/loans';
+import { propertyTypes } from '../data/property';
+import { site } from '../data/site';
+const path = Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '') || '/';
+const isIn = (p: string) => path.startsWith(p);
+const ventureLinks = [
+  ...propertyTypes.map((t) => ({ href: `/dwarika-venture/${t.slug}/`, name: t.name, img: t.img })),
+  { href: '/dwarika-venture/sell-your-property/', name: 'Sell Your Property', img: 'img-v5-sell-property' },
+  { href: "/dwarika-venture/buyers-guide/", name: "Buyer's Guide", img: 'img-v6-buyers-guide' },
+];
+---
+<header class="site-header" id="site-header" transition:persist="header">
+  <div class="wrap">
+    <a class="brand" href={u('/')} aria-label="SINTEL Enterprises home">
+      <Mark />
+      <span><span class="brand-word">SINTEL</span><span class="brand-sub">ENTERPRISES</span></span>
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      <div class:list={['nav-item', { active: isIn('/about') }]}><a class="nav-link" href={u('/about/')}>About</a></div>
+      <div class:list={['nav-item', { active: isIn('/dwarika-finserv') }]}>
+        <a class="nav-link" href={u('/dwarika-finserv/')}>Dwarika Finserv <Icon name="chev" class="chev" /></a>
+        <div class="dropdown">
+          {loans.map((l) => <a href={u(`/dwarika-finserv/${l.slug}/`)}><img src={m(`img/${l.img}-sm.webp`)} alt="" loading="lazy" width="34" height="34" />{l.name}</a>)}
+          <a class="dd-all" href={u('/dwarika-finserv/')}>All loans <Icon name="arrow" class="chev" /></a>
+        </div>
+      </div>
+      <div class:list={['nav-item', { active: isIn('/dwarika-venture') }]}>
+        <a class="nav-link" href={u('/dwarika-venture/')}>Dwarika Venture <Icon name="chev" class="chev" /></a>
+        <div class="dropdown">
+          {ventureLinks.map((l) => <a href={u(l.href)}><img src={m(`img/${l.img}-sm.webp`)} alt="" loading="lazy" width="34" height="34" />{l.name}</a>)}
+          <a class="dd-all" href={u('/dwarika-venture/')}>All properties <Icon name="arrow" class="chev" /></a>
+        </div>
+      </div>
+      <div class:list={['nav-item', { active: isIn('/contact') }]}><a class="nav-link" href={u('/contact/')}>Contact</a></div>
+      <span class="nav-ind" aria-hidden="true"></span>
+    </nav>
+
+    <div class="header-cta">
+      <a class="btn btn-gold btn-sm btn-enq magnetic" href={u('/contact/#enquire')}>Enquire</a>
+      <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" transition:persist="mobile-menu">
+  <a href={u('/')}>Home</a>
+  <a href={u('/about/')}>About</a>
+  <details>
+    <summary>Dwarika Finserv</summary>
+    <a href={u('/dwarika-finserv/')}>Overview</a>
+    {loans.map((l) => <a href={u(`/dwarika-finserv/${l.slug}/`)}>{l.name}</a>)}
+  </details>
+  <details>
+    <summary>Dwarika Venture</summary>
+    <a href={u('/dwarika-venture/')}>Overview</a>
+    {ventureLinks.map((l) => <a href={u(l.href)}>{l.name}</a>)}
+  </details>
+  <a href={u('/contact/')}>Contact</a>
+  <div class="btns">
+    <a class="btn btn-gold" href={u('/contact/#enquire')}>Enquire <Icon name="arrow" class="chev arr" /></a>
+    <a class="btn" href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a>
+  </div>
+</div>

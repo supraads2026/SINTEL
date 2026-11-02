@@ -1,0 +1,21 @@
+---
+import Icon from './Icon.astro';
+import { m, u } from '../lib/url';
+interface Item { href: string; title: string; desc: string; img: string }
+interface Props { items: Item[] }
+const { items } = Astro.props;
+---
+<div class="hlist-wrap" data-hover-list>
+  <ul class="hlist">
+    {items.map((it, i) => (
+      <li data-reveal>
+        <a href={u(it.href)} data-img={m(`img/${it.img}-sm.webp`)}>
+          <span class="n">{String(i + 1).padStart(2, '0')}</span>
+          <img class="thumb" src={m(`img/${it.img}-xs.webp`)} alt="" loading="lazy" width="72" height="72" />
+          <span><span class="t">{it.title}</span><span class="d">{it.desc}</span></span>
+          <span class="go"><Icon name="arrow" class="chev" /></span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>

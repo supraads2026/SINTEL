@@ -1,0 +1,72 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import { loans } from '../data/loans';
+import { propertyTypes } from '../data/property';
+import { m } from '../lib/url';
+interface Props {
+  title?: [string, string];
+  text?: string;
+  interest?: 'finserv' | 'venture';
+  need?: string; // pre-selected loan or property need
+  bg?: 'green' | 'dark';
+  img?: string;
+  id?: string;
+}
+const {
+  title = ['Tell us', 'what you need.'],
+  text = 'Share a few details and our team will call you back. Prefer chatting? Message us on WhatsApp.',
+  interest = '',
+  need = '',
+  bg = 'green',
+  img,
+  id = 'enquire',
+} = Astro.props;
+const needs = [
+  ...loans.map((l) => ({ v: l.name, g: 'finserv' })),
+  ...propertyTypes.map((t) => ({ v: `Buy: ${t.name}`, g: 'venture' })),
+  { v: 'Sell my property', g: 'venture' },
+];
+---
+<section class:list={['section', bg === 'green' ? 'green' : 'dark']} id={id}>
+  <div class="wrap enquiry">
+    <div>
+      <p class="eyebrow">Enquire</p>
+      <h2><span class="line"><span>{title[0]}</span></span><span class="line"><span><em>{title[1]}</em></span></span></h2>
+      <p class="lead mt-2" style="color:rgba(252,251,246,.92)">{text}</p>
+      <div class="btns mt-2">
+        <a class="btn" href={`tel:${site.phoneHref}`}><Icon name="phone" class="chev" /> {site.phone}</a>
+      </div>
+      {img && <img src={m(`img/${img}-sm.webp`)} alt="" loading="lazy" width="720" height="402" style="margin-top:2.5rem;border-radius:20px;opacity:.95" data-parallax />}
+    </div>
+    <form class="form" data-enquiry novalidate>
+      <input type="hidden" name="access_key" value={site.web3formsKey} />
+      <input type="hidden" name="subject" value="New website enquiry — SINTEL" />
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this unchecked" />
+      <div class="field"><label for={`${id}-name`}>Name</label><input id={`${id}-name`} name="name" required autocomplete="name" placeholder="Your full name" /></div>
+      <div class="field"><label for={`${id}-mobile`}>Mobile</label><input id={`${id}-mobile`} name="mobile" required type="tel" inputmode="tel" autocomplete="tel" placeholder="10-digit mobile" pattern="[0-9+\s\-]{10,15}" /></div>
+      <div class="field"><label for={`${id}-int`}>I'm interested in</label>
+        <select id={`${id}-int`} name="interested_in" required>
+          <option value="" disabled selected={!interest}>Choose one</option>
+          <option value="Dwarika Finserv (loans)" selected={interest === 'finserv'}>Dwarika Finserv (loans)</option>
+          <option value="Dwarika Venture (property)" selected={interest === 'venture'}>Dwarika Venture (property)</option>
+        </select>
+      </div>
+      <div class="field"><label for={`${id}-need`}>Loan type or property need</label>
+        <select id={`${id}-need`} name="need">
+          <option value="" selected={!need}>Not sure yet</option>
+          <optgroup label="Dwarika Finserv">{needs.filter((n) => n.g === 'finserv').map((n) => <option selected={need === n.v}>{n.v}</option>)}</optgroup>
+          <optgroup label="Dwarika Venture">{needs.filter((n) => n.g === 'venture').map((n) => <option selected={need === n.v}>{n.v}</option>)}</optgroup>
+          {need && !needs.some((n) => n.v === need) && <option selected>{need}</option>}
+        </select>
+      </div>
+      <div class="field full"><label for={`${id}-msg`}>Message</label><textarea id={`${id}-msg`} name="message" rows="4" placeholder="Anything you'd like us to know (optional)"></textarea></div>
+      <label class="consent full"><input type="checkbox" name="consent" required /> <span>I agree to be contacted by SINTEL Enterprises by phone, WhatsApp or email about my enquiry.</span></label>
+      <div class="btns full">
+        <button class="btn btn-gold magnetic" type="submit">Send enquiry <Icon name="arrow" class="chev arr" /></button>
+        <button class="btn" type="button" data-wa-send><Icon name="wa" class="chev" /> Chat on WhatsApp</button>
+      </div>
+      <p class="form-status full" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>

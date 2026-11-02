@@ -1,0 +1,112 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import HoverList from '../../components/HoverList.astro';
+import Steps from '../../components/Steps.astro';
+import Enquiry from '../../components/Enquiry.astro';
+import PropertyCard from '../../components/PropertyCard.astro';
+import Disclaimer from '../../components/Disclaimer.astro';
+import { m, u } from '../../lib/url';
+import { propertyTypes, properties } from '../../data/property';
+import { site } from '../../data/site';
+
+const why = [
+  { icon: 'shield', t: 'Verified documents', d: 'We check title, approvals and ORERA details before we list.' },
+  { icon: 'eye', t: 'Site visits arranged', d: 'See the property in person at a time that suits you.' },
+  { icon: 'key', t: 'Home-loan help', d: 'Dwarika Finserv can help you fund the purchase.' },
+  { icon: 'handshake', t: 'Guidance till registration', d: 'We stay with you through booking and registration. TODO(SINTEL): confirm' },
+];
+const schema = [{ '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: site.venture, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', telephone: site.phoneHref }];
+---
+<Base title="Dwarika Venture | Property for Sale in Bhubaneswar" description="Flats, villas, plots and commercial property for sale in and around Bhubaneswar, with honest advice from Dwarika Venture." pageName="Dwarika Venture" schema={schema}>
+  <section class="hero" aria-label="Dwarika Venture">
+    <div class="hero-media">
+      <div class="stage">
+        <img class="poster" src={m('img/vid-05-venture-hero-poster.webp')} srcset={`${m('img/vid-05-venture-hero-poster-m.webp')} 960w, ${m('img/vid-05-venture-hero-poster.webp')} 1280w`} sizes="100vw" alt="" width="1280" height="720" fetchpriority="high" transition:name="hero-venture" />
+        <video data-hero-video muted playsinline loop preload="none" poster={m('img/vid-05-venture-hero-poster.webp')} aria-hidden="true"><source src={m('video/vid-05-venture-hero-m.mp4')} type="video/mp4" media="(max-width: 900px)" /><source src={m('video/vid-05-venture-hero.mp4')} type="video/mp4" /></video>
+      </div>
+    </div>
+    <div class="wrap hero-content">
+      <p class="eyebrow" data-hero-in>Dwarika Venture</p>
+      <h1><span class="line"><span>Find the right</span></span><span class="line"><span><em>property.</em></span></span></h1>
+      <p class="lead" data-hero-in>Flats, villas, plots and commercial spaces in and around Bhubaneswar, with honest advice.</p>
+      <div class="btns" data-hero-in>
+        <a class="btn btn-gold magnetic" href="#listings">Explore properties <Icon name="arrow" class="chev arr" /></a>
+        <a class="btn magnetic" href={u('/dwarika-venture/sell-your-property/')}>Sell your property <Icon name="arrow" class="chev arr" /></a>
+      </div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
+  </section>
+
+  <section class="section dark deep">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Property types</p><h2 data-split>What are you <em>looking for?</em></h2></div>
+      <HoverList items={propertyTypes.map((t) => ({ href: `/dwarika-venture/${t.slug}/`, title: t.name, desc: t.oneLiner, img: t.img }))} />
+    </div>
+  </section>
+
+  <section class="section ivory" id="listings">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Featured properties</p><h2 data-split>On the <em>market.</em></h2></div>
+      <div class="chips" data-filters="#all-props" style="margin-bottom:32px">
+        <button class="chip" data-k="all" aria-pressed="true">All</button>
+        {propertyTypes.map((t) => <button class="chip" data-k={t.key} aria-pressed="false">{t.name.split(' ')[0].replace('&', '')}</button>)}
+      </div>
+      <div class="prop-grid" id="all-props">{properties.map((p) => <PropertyCard p={p} />)}</div>
+      {properties.length === 0 && <p class="empty">New listings coming soon. Tell us what you're looking for below.</p>}
+    </div>
+  </section>
+
+  <section class="section dark">
+    <div class="wrap two-col">
+      <div>
+        <div class="sec-head"><p class="eyebrow">Why buy with us</p><h2 data-split>Buy with <em>confidence.</em></h2></div>
+        <img src={m('img/img-06-plot-map-sm.webp')} alt="Planned neighbourhood with gold-edged plots" loading="lazy" width="720" height="402" style="border-radius:22px;height:auto" data-parallax />
+      </div>
+      <div class="cards cards-2">
+        {why.map((w) => <div class="card" data-reveal><span class="icon"><Icon name={w.icon} /></span><h3>{w.t}</h3><p set:html={w.d.replace(/TODO\(SINTEL\):\s*(.+)$/, '<mark class="todo">$1</mark>')} /></div>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Buying process</p><h2 data-split>Four steps <em>home.</em></h2></div>
+      <Steps steps={[
+        { t: 'Choose', d: 'Shortlist properties that fit your needs and budget.' },
+        { t: 'Visit', d: 'We arrange site visits and answer your questions.' },
+        { t: 'Documents & booking', d: 'Check the papers, agree the terms and book.' },
+        { t: 'Registration', d: 'Complete registration and take possession.' },
+      ]} />
+    </div>
+  </section>
+
+  <section class="section dark deep">
+    <div class="wrap two-col" style="align-items:center">
+      <div>
+        <p class="eyebrow">For owners</p>
+        <h2 data-split>Own a property <em>you want to sell?</em></h2>
+        <p class="lead muted mt-2">List it with Dwarika Venture and we'll bring it to genuine buyers.</p>
+        <div class="btns mt-2"><a class="btn btn-gold magnetic" href={u('/dwarika-venture/sell-your-property/')}>Sell your property <Icon name="arrow" class="chev arr" /></a></div>
+      </div>
+      <img src={m('img/img-v5-sell-property-sm.webp')} alt="Gold key above a small emerald house" loading="lazy" width="720" height="720" style="border-radius:26px;width:min(420px,100%);justify-self:center" class="floaty" />
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Buyer's guide</p><h2 data-split>Know before <em>you buy.</em></h2></div>
+      <div class="cards">
+        {[
+          { icon: 'doc', t: 'Documents to check', d: 'Title deed, encumbrance, RoR / mutation and the approved plan.', h: '#documents' },
+          { icon: 'shield', t: 'What ORERA means', d: 'How project registration protects buyers, and how to check it.', h: '#orera' },
+          { icon: 'compass', t: 'Registration steps', d: 'Stamp duty and registration in Odisha, in plain language.', h: '#registration' },
+        ].map((c) => <a class="card" style="text-decoration:none" href={u(`/dwarika-venture/buyers-guide/${c.h}`)} data-reveal><span class="icon"><Icon name={c.icon} /></span><h3>{c.t}</h3><p>{c.d}</p></a>)}
+      </div>
+      <div class="btns mt-3"><a class="btn btn-green magnetic" href={u('/dwarika-venture/buyers-guide/')}>Read the guide <Icon name="arrow" class="chev arr" /></a></div>
+    </div>
+  </section>
+
+  <Enquiry interest="venture" title={['Tell us what', "you're looking for."]} />
+  <Disclaimer kind="venture" />
+</Base>

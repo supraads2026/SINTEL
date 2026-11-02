@@ -1,0 +1,34 @@
+---
+import { m, u } from '../lib/url';
+interface Props {
+  eyebrow?: string;
+  h1: [string, string];
+  lead?: string;
+  img?: string; // base name in /media/img without extension
+  wide?: boolean;
+  morph?: string; // view-transition name, shared with the card that links here
+  crumbs?: { href: string; name: string }[];
+}
+const { eyebrow, h1, lead, img, wide = false, morph, crumbs = [] } = Astro.props;
+---
+<section class="page-hero">
+  <div class="wrap grid">
+    <div>
+      {crumbs.length > 0 && (
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href={u('/')}>Home</a>
+          {crumbs.map((c) => <><span>/</span><a href={u(c.href)}>{c.name}</a></>)}
+        </nav>
+      )}
+      {eyebrow && <p class="eyebrow" data-hero-in>{eyebrow}</p>}
+      <h1><span class="line"><span>{h1[0]}</span></span><span class="line"><span><em>{h1[1]}</em></span></span></h1>
+      {lead && <p class="lead" data-hero-in>{lead}</p>}
+      <div data-hero-in><slot /></div>
+    </div>
+    {img && (
+      <div class:list={['art', { wide }]} transition:name={morph}>
+        <img class="floaty" src={m(`img/${img}.webp`)} srcset={`${m(`img/${img}-sm.webp`)} 720w, ${m(`img/${img}.webp`)} ${wide ? 1376 : 1024}w`} sizes="(max-width: 860px) 92vw, 46vw" alt="" width={wide ? 1376 : 1024} height={wide ? 768 : 1024} fetchpriority="high" />
+      </div>
+    )}
+  </div>
+</section>

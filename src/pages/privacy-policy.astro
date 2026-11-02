@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { site } from '../data/site';
+---
+<Base title="Privacy Policy" description="How SINTEL Enterprises collects and uses the information you share through this website." pageName="Privacy">
+  <PageHero h1={['Privacy', 'policy.']} />
+  <section class="section ivory"><div class="wrap prose">
+    <p><mark class="todo">To confirm: SINTEL to review this policy (ideally with legal advice) before launch.</mark></p>
+    <h2>What we collect</h2>
+    <p>When you send an enquiry, we collect the details you choose to share: your name, mobile number, what you are interested in and your message. If you contact us on WhatsApp, WhatsApp's own privacy policy also applies.</p>
+    <h2>How we use it</h2>
+    <p>We use your details only to respond to your enquiry and to help you with the loan or property you asked about. With your consent, we may share relevant details with a lending bank or NBFC, or with a property seller or buyer, to take your request forward.</p>
+    <h2>Analytics</h2>
+    <p>We may use Google Analytics to understand how visitors use this website. It uses cookies and collects anonymous usage data.</p>
+    <h2>Your choices</h2>
+    <p>You can ask us to update or delete your details at any time by contacting us at {site.email} or {site.phone}.</p>
+    <h2>Contact</h2>
+    <p>{site.legalName}, {site.addressLines.join(', ')}.</p>
+  </div></section>
+</Base>

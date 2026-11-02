@@ -1,0 +1,79 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import HoverList from '../../components/HoverList.astro';
+import Steps from '../../components/Steps.astro';
+import Faq from '../../components/Faq.astro';
+import Enquiry from '../../components/Enquiry.astro';
+import Disclaimer from '../../components/Disclaimer.astro';
+import { m } from '../../lib/url';
+import { loans } from '../../data/loans';
+import { site } from '../../data/site';
+
+const docs = [
+  { icon: 'shield', t: 'Identity & address proof', d: 'PAN, Aadhaar and a current address proof for every applicant.' },
+  { icon: 'doc', t: 'Income proof', d: 'Salary slips for salaried applicants; ITR and financials for the self-employed.' },
+  { icon: 'layers', t: 'Bank statements', d: 'Usually the last 6 to 12 months for your main accounts.' },
+  { icon: 'home', t: 'Property papers', d: 'For secured loans: title deed, RoR / mutation, approved plan and tax receipts.' },
+];
+const schema = [{ '@context': 'https://schema.org', '@type': 'FinancialService', name: site.finserv, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', telephone: site.phoneHref,
+  hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Loans', itemListElement: loans.map((l) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: l.name } })) } }];
+---
+<Base title="Dwarika Finserv | Loans & Funding in Bhubaneswar" description="Dwarika Finserv helps individuals and businesses in Bhubaneswar find suitable personal, business, home and property-backed loans, explained simply." pageName="Dwarika Finserv" schema={schema}>
+  <section class="hero" aria-label="Dwarika Finserv">
+    <div class="hero-media">
+      <div class="stage">
+        <img class="poster" src={m('img/vid-02-finserv-hero-poster.webp')} srcset={`${m('img/vid-02-finserv-hero-poster-m.webp')} 960w, ${m('img/vid-02-finserv-hero-poster.webp')} 1280w`} sizes="100vw" alt="" width="1280" height="720" fetchpriority="high" transition:name="hero-finserv" />
+        <video data-hero-video muted playsinline loop preload="none" poster={m('img/vid-02-finserv-hero-poster.webp')} aria-hidden="true"><source src={m('video/vid-02-finserv-hero-m.mp4')} type="video/mp4" media="(max-width: 900px)" /><source src={m('video/vid-02-finserv-hero.mp4')} type="video/mp4" /></video>
+      </div>
+    </div>
+    <div class="wrap hero-content">
+      <p class="eyebrow" data-hero-in>Dwarika Finserv</p>
+      <h1><span class="line"><span>Funding for</span></span><span class="line"><span><em>every goal.</em></span></span></h1>
+      <p class="lead" data-hero-in>Personal, business and property-backed loans, explained simply.</p>
+      <div class="btns" data-hero-in><a class="btn btn-gold magnetic" href="#enquire">Talk to a loan expert <Icon name="arrow" class="chev arr" /></a></div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
+  </section>
+
+  <section class="section dark deep">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Seven loans</p><h2 data-split>Choose what <em>fits you.</em></h2></div>
+      <HoverList items={loans.map((l) => ({ href: `/dwarika-finserv/${l.slug}/`, title: l.name, desc: l.oneLiner, img: l.img }))} />
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">How it works</p><h2 data-split>From enquiry <em>to sanction.</em></h2></div>
+      <Steps steps={[
+        { t: 'Enquire', d: 'Tell us what you need by form, call or WhatsApp.' },
+        { t: 'We call you', d: 'We understand your income, need and timeline.' },
+        { t: 'Compare options', d: 'We help you compare suitable lenders and products.' },
+        { t: 'Processing & sanction', d: 'The lender processes your file; we help with the paperwork.' },
+      ]} />
+    </div>
+  </section>
+
+  <section class="section dark">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Documents</p><h2 data-split>What you'll <em>usually need.</em></h2><p class="muted">The final list depends on the lender and the loan.</p></div>
+      <div class="cards">{docs.map((d) => <div class="card" data-reveal><span class="icon"><Icon name={d.icon} /></span><h3>{d.t}</h3><p>{d.d}</p></div>)}</div>
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap two-col">
+      <div class="sec-head"><p class="eyebrow">FAQs</p><h2 data-split>Questions, <em>answered.</em></h2></div>
+      <Faq faqs={[
+        { q: 'How long does approval take?', a: 'It depends on the loan and the lender. TODO(SINTEL): add typical timelines.' },
+        { q: 'Do you charge a fee?', a: 'TODO(SINTEL): explain the fee policy.' },
+        { q: 'Which banks do you work with?', a: 'We work with banks and NBFCs. TODO(SINTEL): confirm which partner names can be shown.' },
+        { q: 'Can self-employed people apply?', a: 'Yes. Self-employed applicants usually share income-tax returns, financial statements and bank statements instead of salary slips.' },
+      ]} />
+    </div>
+  </section>
+
+  <Enquiry interest="finserv" title={['Talk to a', 'loan expert.']} />
+  <Disclaimer />
+</Base>

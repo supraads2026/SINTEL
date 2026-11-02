@@ -1,0 +1,13 @@
+---
+import { m, u } from '../lib/url';
+interface Props { items: { href: string; title: string; desc: string; img: string }[] }
+const { items } = Astro.props;
+---
+<div class="rel-grid">
+  {items.map((it) => (
+    <a class="rel-card" href={u(it.href)} data-reveal>
+      <img src={m(`img/${it.img}-sm.webp`)} alt="" loading="lazy" width="720" height="720" />
+      <div><h3>{it.title}</h3><p>{it.desc}</p></div>
+    </a>
+  ))}
+</div>

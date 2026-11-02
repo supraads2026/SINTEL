@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import Enquiry from '../../components/Enquiry.astro';
+import Disclaimer from '../../components/Disclaimer.astro';
+import { u } from '../../lib/url';
+const chapters = [
+  { id: 'before', t: 'Before you buy' },
+  { id: 'documents', t: 'Documents to check' },
+  { id: 'orera', t: 'ORERA' },
+  { id: 'home-loans', t: 'Home loans' },
+  { id: 'registration', t: 'Registration in Odisha' },
+];
+---
+<Base title="Buyer's Guide to Property in Odisha | Dwarika Venture" description="A plain-language guide to buying property in Bhubaneswar: documents to check, what ORERA means, home loans and registration in Odisha." pageName="Buyer's Guide" image="img/img-v6-buyers-guide.webp">
+  <PageHero eyebrow="Dwarika Venture · Buyer's guide" h1={["Buying property?", 'Start here.']} lead="Plain-language guidance on documents, ORERA, home loans and registration in Odisha." img="img-v6-buyers-guide" crumbs={[{ href: '/dwarika-venture/', name: 'Dwarika Venture' }]} />
+
+  <section class="section ivory">
+    <div class="wrap toc-layout">
+      <nav class="toc" aria-label="Chapters">{chapters.map((c) => <a href={`#${c.id}`}>{c.t}</a>)}</nav>
+      <div class="prose">
+        <p><mark class="todo">To confirm: SINTEL to review and approve this general guidance before launch.</mark></p>
+
+        <h2 id="before">Before you buy</h2>
+        <ul>
+          <li><b>Budget:</b> add registration, stamp duty, interiors and moving costs to the price, not just the down payment.</li>
+          <li><b>Location:</b> visit at different times of day; check the road, water, power, schools and travel time to work.</li>
+          <li><b>Ready vs under construction:</b> ready homes let you see exactly what you get; under-construction homes may cost less but depend on the builder delivering on time.</li>
+        </ul>
+
+        <h2 id="documents">Documents to check</h2>
+        <ul>
+          <li><b>Title deed / sale deed:</b> shows the seller owns the property and can sell it.</li>
+          <li><b>Encumbrance certificate:</b> shows whether the property has a loan or other claim against it.</li>
+          <li><b>RoR (Record of Rights) and mutation:</b> the land record in the owner's name, from the Odisha land records.</li>
+          <li><b>Approved building plan / layout:</b> the plan approved by the development authority (for example BDA).</li>
+          <li><b>Tax receipts:</b> the latest property / holding tax and utility bills paid.</li>
+        </ul>
+
+        <h2 id="orera">ORERA</h2>
+        <p>The Odisha Real Estate Regulatory Authority (ORERA) registers real-estate projects under the RERA Act. Registered projects must share their approvals, plans and timelines, and advertise carpet area.</p>
+        <p>Before you book in a new project, ask for its ORERA registration number and check it on the ORERA website. Every listing on this site shows the number where it applies.</p>
+
+        <h2 id="home-loans">Home loans</h2>
+        <p>A home loan lets you pay for the property over many years. The lender checks your income, credit history and the property's documents before sanctioning the loan. Getting an in-principle idea of your eligibility early helps you shortlist the right homes.</p>
+        <p><a class="link-arrow" href={u('/dwarika-finserv/home-loan/')}>Home loans with Dwarika Finserv <Icon name="arrow" class="chev arr" /></a></p>
+
+        <h2 id="registration">Registration in Odisha</h2>
+        <p>The sale is completed by registering the sale deed at the Sub-Registrar office, where stamp duty and registration fees are paid. Buyer, seller and witnesses usually need to be present with ID proof.</p>
+        <p>Stamp duty and registration rates change from time to time, so always check the current rates with the registration office or the Odisha IGR website before you budget.</p>
+      </div>
+    </div>
+  </section>
+
+  <Enquiry interest="venture" title={['Have a question', 'about buying?']} />
+  <Disclaimer kind="venture" />
+</Base>

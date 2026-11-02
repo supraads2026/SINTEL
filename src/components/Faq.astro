@@ -1,0 +1,13 @@
+---
+import { fmt } from '../lib/text';
+interface Props { faqs: { q: string; a: string }[] }
+const { faqs } = Astro.props;
+---
+<div class="faq">
+  {faqs.map((f) => (
+    <details>
+      <summary>{f.q}</summary>
+      <div class="ans"><p set:html={fmt(f.a)} /></div>
+    </details>
+  ))}
+</div>

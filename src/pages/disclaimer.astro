@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { site } from '../data/site';
+---
+<Base title="Disclaimer" description="Important information about the loan and property services described on the SINTEL Enterprises website." pageName="Disclaimer">
+  <PageHero h1={['Website', 'disclaimer.']} />
+  <section class="section ivory"><div class="wrap prose">
+    <p><mark class="todo">To confirm: SINTEL to review this disclaimer before launch.</mark></p>
+    <h2>{site.finserv}</h2>
+    <p>{site.finserv} helps you find suitable loan options from banks and NBFCs. We are not a lender. Loan approval, interest rates, fees and terms are decided solely by the lending institution, and eligibility is subject to its policies and checks.</p>
+    <h2>{site.venture}</h2>
+    <p>Property details, prices and availability are shared in good faith and can change without notice. Buyers should verify all documents, approvals and ORERA registration independently before making any payment. Images on this website are illustrative.</p>
+    <h2>General</h2>
+    <p>The information on this website is general guidance and not financial or legal advice. {site.legalName} is not liable for decisions made only on the basis of this website.</p>
+  </div></section>
+</Base>

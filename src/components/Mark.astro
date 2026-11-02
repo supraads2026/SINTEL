@@ -1,0 +1,11 @@
+---
+// Placeholder SINTEL building mark (five towers rising left to right). Replace with the client's logo SVG when it arrives.
+interface Props { class?: string; title?: string }
+const { class: cls, title = 'SINTEL' } = Astro.props;
+---
+<svg class={cls} viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label={title}>
+  <path d="M8 58V34h7v24" /><path d="M18 58V26h7v32" /><path d="M28 58V16h8v42" />
+  <path d="M39 58V22h7v36" /><path d="M49 58V30h7v28" />
+  <path d="M28 16l4-6 4 6" /><path d="M18 26l3.5-4 3.5 4" /><path d="M39 22l3.5-4 3.5 4" />
+  <line x1="4" y1="58" x2="60" y2="58" />
+</svg>

@@ -1,0 +1,99 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Mark from '../components/Mark.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { m } from '../lib/url';
+
+interface Props {
+  title: string;
+  description: string;
+  pageName?: string; // shown on the page-transition curtain
+  image?: string; // /media/... file for social sharing
+  schema?: Record<string, unknown>[];
+  noindex?: boolean;
+}
+const { title, description, pageName, image = 'og.jpg', schema = [], noindex = false } = Astro.props;
+const fullTitle = title.includes('SINTEL') || title.includes('|') ? title : `${title} | SINTEL Enterprises`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(m(image), Astro.site);
+const org = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.legalName,
+  url: new URL(import.meta.env.BASE_URL, Astro.site).href,
+  logo: new URL(m('og.jpg'), Astro.site).href,
+  telephone: site.phoneHref,
+  address: { '@type': 'PostalAddress', streetAddress: site.addressLines[0], addressLocality: site.city, addressRegion: site.region, addressCountry: 'IN' },
+  subOrganization: [{ '@type': 'FinancialService', name: site.finserv }, { '@type': 'RealEstateAgent', name: site.venture }],
+};
+---
+<!doctype html>
+<html lang="en-IN" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#073B2B" />
+    <link rel="icon" href={m('favicon.svg')} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SINTEL Enterprises" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" /></noscript>
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.remove('no-js');
+        try { if (sessionStorage.getItem('sintel-seen')) d.classList.add('seen'); } catch (e) {}
+        var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var c = navigator.connection; var slow = c && (c.saveData || /2g/.test(c.effectiveType || ''));
+        if (rm || slow) d.classList.add('no-motion', 'seen');
+      })();
+    </script>
+    <script type="application/ld+json" set:html={JSON.stringify([org, ...schema])} />
+    <ClientRouter fallback="swap" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <div class="preloader" id="preloader" aria-hidden="true" transition:persist="preloader">
+      <Mark class="mark" />
+      <span class="cap">Building opportunities…</span>
+      <span class="count" id="pl-count">00</span>
+      <span class="bar" id="pl-bar"></span>
+    </div>
+
+    <div class="curtain" id="curtain" aria-hidden="true" transition:persist="curtain">
+      <div class="in"><Mark /><span class="pn" id="curtain-name"></span></div>
+    </div>
+
+    <Header />
+
+    <main id="main" data-page-name={pageName ?? title}>
+      <slot />
+    </main>
+
+    <Footer />
+
+    <a class="wa-float" href={`https://wa.me/${site.whatsapp}?text=${encodeURIComponent('Hi SINTEL, I would like to know more.')}`} target="_blank" rel="noopener" aria-label="Chat on WhatsApp" transition:persist="wa"><Icon name="wa" /></a>
+    <button class="to-top" type="button" aria-label="Back to top" transition:persist="totop"><Icon name="up" class="chev" /></button>
+
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>
