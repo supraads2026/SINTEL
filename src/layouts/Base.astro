@@ -62,6 +62,13 @@ const org = {
         var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         var c = navigator.connection; var slow = c && (c.saveData || /2g/.test(c.effectiveType || ''));
         if (rm || slow) d.classList.add('no-motion', 'seen');
+        if (!window.__sintelGuard) {
+          window.__sintelGuard = true;
+          setTimeout(function () {
+            d.classList.add('seen');
+            try { sessionStorage.setItem('sintel-seen', '1'); } catch (e) {}
+          }, 6000);
+        }
       })();
     </script>
     <script type="application/ld+json" set:html={JSON.stringify([org, ...schema])} />

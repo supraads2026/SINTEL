@@ -32,17 +32,17 @@ function runPreloader(): Promise<void> {
     const finish = () => {
       try { sessionStorage.setItem('sintel-seen', '1'); } catch {}
       gsap.to(pl, {
-        yPercent: -100, duration: 0.85, ease: 'expo.inOut', delay: 0.1,
+        yPercent: -100, duration: 0.7, ease: 'expo.inOut', delay: 0.05,
         onComplete: () => { root.classList.add('seen'); pl.style.transform = ''; lenis?.start(); resolve(); },
       });
     };
     const tick = () => { count.textContent = String(Math.round(state.v)).padStart(2, '0'); bar.style.transform = `scaleX(${state.v / 100})`; };
     // Count to ~80 while loading, then to 100 once the page has loaded
-    const t1 = gsap.to(state, { v: 82, duration: 1.4, ease: 'power2.out', onUpdate: tick });
+    const t1 = gsap.to(state, { v: 82, duration: 1.0, ease: 'power2.out', onUpdate: tick });
     const done = () => { t1.kill(); gsap.to(state, { v: 100, duration: 0.4, ease: 'power2.inOut', onUpdate: tick, onComplete: finish }); };
-    const minTime = new Promise((r) => setTimeout(r, 900));
-    const loaded = document.readyState === 'complete' ? Promise.resolve() : new Promise((r) => window.addEventListener('load', r, { once: true }));
-    Promise.all([minTime, Promise.race([loaded, new Promise((r) => setTimeout(r, 3500))])]).then(done);
+    const minTime = new Promise((r) => setTimeout(r, 700));
+    const fonts = (document as any).fonts?.ready ?? Promise.resolve();
+    Promise.all([minTime, Promise.race([fonts, new Promise((r) => setTimeout(r, 1800))])]).then(done);
   });
 }
 
@@ -98,7 +98,12 @@ document.addEventListener('astro:before-preparation', (ev: any) => {
   };
 });
 
-document.addEventListener('astro:before-swap', () => {
+document.addEventListener('astro:before-swap', (ev: any) => {
+  // The router copies the new page's <html class="no-js"> over ours. Carry our state across instead:
+  // without "seen" the first-visit loader would come back and cover every page after a click.
+  const keep = [...root.classList].filter((c) => c !== 'no-js');
+  if (!keep.includes('seen')) keep.push('seen');
+  ev.newDocument.documentElement.className = keep.join(' ');
   cleanups.forEach((f) => f());
   cleanups = [];
   ScrollTrigger.getAll().forEach((t) => t.kill());
