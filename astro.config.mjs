@@ -13,5 +13,5 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [sitemap({ filter: (page) => !page.includes('/404') })],
   build: { inlineStylesheets: 'auto' },
-  prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
 });

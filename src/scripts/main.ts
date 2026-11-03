@@ -48,25 +48,38 @@ function runPreloader(): Promise<void> {
 
 // ───────────────── Page-transition curtain ─────────────────
 const curtain = () => document.getElementById('curtain')!;
-let curtainShown = false;
-function curtainIn(name: string) {
+// One timeline at a time: a new click cancels whatever the curtain was doing,
+// so two animations can never fight over it and leave it stuck closed.
+let curtainTl: gsap.core.Timeline | null = null;
+let failsafe = 0;
+function curtainIn(name: string): Promise<void> {
   const c = curtain();
-  curtainShown = true;
+  const inner = c.querySelector('.in');
+  curtainTl?.kill();
+  clearTimeout(failsafe);
   document.getElementById('curtain-name')!.textContent = name;
-  return gsap.timeline()
-    .set(c, { clipPath: 'inset(100% 0 0 0)' })
-    .to(c, { clipPath: 'inset(0% 0 0 0)', duration: 0.7, ease: 'expo.inOut' })
-    .to(c.querySelector('.in'), { opacity: 1, y: 0, duration: 0.35 }, '-=0.25')
-    .then(() => {});
+  return new Promise((resolve) => {
+    curtainTl = gsap.timeline({ onComplete: resolve, onInterrupt: resolve })
+      .set(c, { clipPath: 'inset(100% 0 0 0)' })
+      .set(inner, { opacity: 0, y: 12 })
+      .to(c, { clipPath: 'inset(0% 0 0 0)', duration: 0.45, ease: 'power3.inOut' })
+      .to(inner, { opacity: 1, y: 0, duration: 0.25 }, '-=0.2');
+    window.setTimeout(resolve, 650); // never hold the navigation hostage to an animation
+  });
 }
 function curtainOut() {
   const c = curtain();
-  if (!curtainShown) return;
-  curtainShown = false;
-  gsap.timeline()
-    .to(c.querySelector('.in'), { opacity: 0, duration: 0.25, delay: 0.15 })
-    .to(c, { clipPath: 'inset(0 0 100% 0)', duration: 0.8, ease: 'expo.inOut' }, '-=0.05')
+  const inner = c.querySelector('.in');
+  const closed = !/inset\(100%/.test(getComputedStyle(c).clipPath) && !/0px 0px 100%|0% 0% 100%/.test(getComputedStyle(c).clipPath);
+  curtainTl?.kill();
+  clearTimeout(failsafe);
+  if (!closed) { gsap.set(c, { clipPath: 'inset(100% 0 0 0)' }); return; }
+  curtainTl = gsap.timeline()
+    .to(inner, { opacity: 0, duration: 0.15 })
+    .to(c, { clipPath: 'inset(0 0 100% 0)', duration: 0.55, ease: 'power3.inOut' }, '-=0.05')
     .set(c, { clipPath: 'inset(100% 0 0 0)' });
+  // Safety net: whatever happens, the curtain is open 1.5 s after a page loads.
+  failsafe = window.setTimeout(() => { curtainTl?.kill(); gsap.set(c, { clipPath: 'inset(100% 0 0 0)' }); }, 1500);
 }
 
 const pageNameFor = (href: string, link?: Element | null) => {
@@ -97,39 +110,45 @@ document.addEventListener('astro:after-swap', () => {
   else window.scrollTo(0, 0);
 });
 
+
+// A failing init on one page must never stop the rest (or the page transition).
+function safe(fn: () => void) {
+  try { fn(); } catch (e) { console.error('[SINTEL] init failed:', e); }
+}
+
 // ───────────────── Per-page setup ─────────────────
 document.addEventListener('astro:page-load', async () => {
-  initLenis();
-  initMenu();
-  setActiveNav();
-  initNavIndicator();
-  initToTop();
-  initForms();
-  initMaps();
-  initFilters();
-  initToc();
-  initHeroVideos();
+  if (!firstLoad) curtainOut();
+  safe(() => initLenis());
+  safe(() => initMenu());
+  safe(() => setActiveNav());
+  safe(() => initNavIndicator());
+  safe(() => initToTop());
+  safe(() => initForms());
+  safe(() => initMaps());
+  safe(() => initFilters());
+  safe(() => initToc());
+  safe(() => initHeroVideos());
 
   if (firstLoad) { firstLoad = false; await runPreloader(); }
-  else curtainOut();
-  initHeroSlider();
+  safe(() => initHeroSlider());
 
   if (!motion()) {
     gsap.set('[data-reveal], [data-hero-in], .line > span', { clearProps: 'all', opacity: 1 });
-    initScrub(false);
+    safe(() => initScrub(false));
     return;
   }
-  heroIn();
-  initSplits();
-  initReveals();
-  initWords();
-  initSteps();
-  initParallax();
-  initHoverLists();
-  initTilt();
-  initMagnetic();
-  initHeader();
-  initScrub(true);
+  safe(() => heroIn());
+  safe(() => initSplits());
+  safe(() => initReveals());
+  safe(() => initWords());
+  safe(() => initSteps());
+  safe(() => initParallax());
+  safe(() => initHoverLists());
+  safe(() => initTilt());
+  safe(() => initMagnetic());
+  safe(() => initHeader());
+  safe(() => initScrub(true));
   requestAnimationFrame(() => ScrollTrigger.refresh());
 });
 
@@ -139,9 +158,10 @@ function heroIn() {
   const lines = hero.querySelectorAll('h1 .line > span');
   const ins = hero.querySelectorAll('[data-hero-in]');
   const tl = gsap.timeline({ delay: 0.1 });
-  tl.from(lines, { yPercent: 115, duration: 1.1, ease: 'expo.out', stagger: 0.12 });
-  tl.from(ins, { opacity: 0, y: 24, duration: 0.9, ease: 'power3.out', stagger: 0.1 }, '-=0.8');
-  tl.from(hero.querySelectorAll('.island-tag'), { opacity: 0, scale: 0.8, duration: 0.8, stagger: 0.15, ease: 'back.out(2)' }, '-=0.6');
+  if (lines.length) tl.from(lines, { yPercent: 115, duration: 1.1, ease: 'expo.out', stagger: 0.12 });
+  if (ins.length) tl.from(ins, { opacity: 0, y: 24, duration: 0.9, ease: 'power3.out', stagger: 0.1 }, '-=0.8');
+  const tags = hero.querySelectorAll('.island-tag');
+  if (tags.length) tl.from(tags, { opacity: 0, scale: 0.8, duration: 0.8, stagger: 0.15, ease: 'back.out(2)' }, '-=0.6');
 }
 
 function initSplits() {
