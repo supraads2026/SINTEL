@@ -8,7 +8,7 @@ import Related from '../../components/Related.astro';
 import Enquiry from '../../components/Enquiry.astro';
 import Disclaimer from '../../components/Disclaimer.astro';
 import { loans, type Loan } from '../../data/loans';
-import { site } from '../../data/site';
+import { site, waLink } from '../../data/site';
 
 export function getStaticPaths() {
   return loans.map((l) => ({ params: { slug: l.slug }, props: { loan: l } }));
@@ -25,7 +25,7 @@ const schema = [
   <PageHero eyebrow="Dwarika Finserv" h1={loan.h1} lead={loan.oneLiner} img={loan.img} crumbs={[{ href: '/dwarika-finserv/', name: 'Dwarika Finserv' }]}>
     <div class="btns">
       <a class="btn btn-gold magnetic" href="#enquire">Enquire about this loan <Icon name="arrow" class="chev arr" /></a>
-      <a class="btn" href={`https://wa.me/${site.whatsapp}?text=${encodeURIComponent(`Hi Dwarika Finserv, I'd like to know about a ${loan.name}.`)}`} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a>
+      <a class="btn" href={waLink(`Hi Dwarika Finserv, I'd like to know about a ${loan.name}.`, 'finserv')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a>
     </div>
   </PageHero>
 

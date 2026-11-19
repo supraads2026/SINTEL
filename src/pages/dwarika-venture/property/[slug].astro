@@ -40,7 +40,7 @@ const similar = properties.filter((x) => x.slug !== p.slug && x.type === p.type)
         <ul class="check-list">{p.highlights.map((h) => <li>{h}</li>)}</ul>
         <div class="btns mt-2">
           <a class="btn btn-green magnetic" href="#enquire">Enquire <Icon name="arrow" class="chev arr" /></a>
-          <a class="btn btn-line-dk" href={waLink(`Hi Dwarika Venture, I'm interested in ${p.title} (${p.location}).`)} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a>
+          <a class="btn btn-line-dk" href={waLink(`Hi Dwarika Venture, I'm interested in ${p.title} (${p.location}).`, 'venture')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a>
         </div>
         <p class="mt-2"><a class="link-arrow" href={u('/dwarika-finserv/home-loan/')}>Need a home loan? Dwarika Finserv <Icon name="arrow" class="chev arr" /></a></p>
       </div>

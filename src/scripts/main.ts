@@ -123,6 +123,7 @@ function safe(fn: () => void) {
 
 // ───────────────── Per-page setup ─────────────────
 document.addEventListener('astro:page-load', async () => {
+  (window as any).__sintelReady = true;
   if (!firstLoad) curtainOut();
   safe(() => initLenis());
   safe(() => initMenu());
@@ -395,7 +396,8 @@ function formToText(f: HTMLFormElement) {
   ].filter(Boolean);
   return lines.join('\n');
 }
-const waNumber = () => (document.querySelector<HTMLAnchorElement>('.wa-float')!.href.match(/wa\.me\/(\d+)/) || [])[1];
+// Venture enquiries go to Dwarika Venture's WhatsApp, everything else to Dwarika Finserv's.
+const waNumber = (f: HTMLFormElement) => (/venture/i.test(String(new FormData(f).get('interested_in') || '')) ? f.dataset.waVenture : f.dataset.waFinserv);
 
 function initForms() {
   document.querySelectorAll<HTMLFormElement>('form[data-enquiry]').forEach((f) => {
@@ -404,7 +406,7 @@ function initForms() {
     const status = f.querySelector<HTMLElement>('.form-status')!;
     const say = (t: string, cls = '') => { status.textContent = t; status.className = `form-status full ${cls}`; };
     f.querySelector('[data-wa-send]')?.addEventListener('click', () => {
-      window.open(`https://wa.me/${waNumber()}?text=${encodeURIComponent(formToText(f))}`, '_blank', 'noopener');
+      window.open(`https://wa.me/${waNumber(f)}?text=${encodeURIComponent(formToText(f))}`, '_blank', 'noopener');
     });
     f.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -412,7 +414,7 @@ function initForms() {
       const key = (f.querySelector<HTMLInputElement>('[name=access_key]')!.value || '').trim();
       if (!key) {
         // No email service configured yet: send the enquiry on WhatsApp instead.
-        window.open(`https://wa.me/${waNumber()}?text=${encodeURIComponent(formToText(f))}`, '_blank', 'noopener');
+        window.open(`https://wa.me/${waNumber(f)}?text=${encodeURIComponent(formToText(f))}`, '_blank', 'noopener');
         say('Opening WhatsApp with your enquiry…', 'ok');
         return;
       }
@@ -581,3 +583,11 @@ function initHeroSlider() {
     media.forEach((_, i) => vid(i).pause());
   });
 }
+
+// WhatsApp chooser (shared pages): close when clicking elsewhere or after picking a company.
+document.addEventListener('click', (e) => {
+  document.querySelectorAll<HTMLDetailsElement>('details.wa-pick[open]').forEach((d) => {
+    const t = e.target as Node;
+    if (!d.contains(t) || (t as HTMLElement).closest?.('.wa-menu a')) d.open = false;
+  });
+});

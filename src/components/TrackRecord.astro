@@ -1,0 +1,19 @@
+---
+import { trackRecord } from '../data/site';
+interface Props { title?: [string, string] }
+const { title = ['A track record', 'you can check.'] } = Astro.props;
+---
+<section class="section dark deep track">
+  <div class="wrap">
+    <div class="sec-head"><p class="eyebrow">Track record</p><h2 data-split>{title[0]} <em>{title[1]}</em></h2></div>
+    <ul class="track-grid">
+      {trackRecord.map((r) => (
+        <li data-reveal>
+          <span class="tv">{r.v}</span>
+          <span class="tt">{r.t}</span>
+          <span class="td">{r.d}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

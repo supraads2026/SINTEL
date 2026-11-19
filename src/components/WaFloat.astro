@@ -1,0 +1,20 @@
+---
+// Floating WhatsApp button. On Finserv / Venture pages it goes straight to that company's number;
+// on shared pages (Home, About, Contact…) it opens a small "which company?" chooser.
+import Icon from './Icon.astro';
+import { site, waLink } from '../data/site';
+const path = Astro.url.pathname;
+const co = path.includes('/dwarika-finserv') ? 'finserv' : path.includes('/dwarika-venture') ? 'venture' : null;
+---
+{co ? (
+  <a class="wa-float" href={waLink(`Hi ${co === 'finserv' ? site.finserv : site.venture}, I would like to know more.`, co)} target="_blank" rel="noopener" aria-label={`Chat with ${co === 'finserv' ? site.finserv : site.venture} on WhatsApp`}><Icon name="wa" /></a>
+) : (
+  <details class="wa-pick">
+    <summary class="wa-float" aria-label="Chat on WhatsApp"><Icon name="wa" /></summary>
+    <div class="wa-menu" role="menu">
+      <p>Chat on WhatsApp with</p>
+      <a role="menuitem" href={waLink(`Hi ${site.finserv}, I would like to know about a loan.`, 'finserv')} target="_blank" rel="noopener"><b>{site.finserv}</b><span>Loans · {site.finservPhone}</span></a>
+      <a role="menuitem" href={waLink(`Hi ${site.venture}, I would like to know about a property.`, 'venture')} target="_blank" rel="noopener"><b>{site.venture}</b><span>Property · {site.venturePhone}</span></a>
+    </div>
+  </details>
+)}

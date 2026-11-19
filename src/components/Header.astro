@@ -4,7 +4,7 @@ import Icon from './Icon.astro';
 import { u, m } from '../lib/url';
 import { loans } from '../data/loans';
 import { propertyTypes } from '../data/property';
-import { site } from '../data/site';
+import { site, waLink } from '../data/site';
 const path = Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '') || '/';
 const isIn = (p: string) => path.startsWith(p);
 const ventureLinks = [
@@ -63,6 +63,7 @@ const ventureLinks = [
   <a href={u('/contact/')}>Contact</a>
   <div class="btns">
     <a class="btn btn-gold" href={u('/contact/#enquire')}>Enquire <Icon name="arrow" class="chev arr" /></a>
-    <a class="btn" href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a>
+    <a class="btn" href={waLink(`Hi ${site.finserv}, I would like to know about a loan.`, 'finserv')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> Finserv</a>
+    <a class="btn" href={waLink(`Hi ${site.venture}, I would like to know about a property.`, 'venture')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> Venture</a>
   </div>
 </div>

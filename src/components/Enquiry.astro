@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-import { site } from '../data/site';
+import { site, telHref } from '../data/site';
 import { loans } from '../data/loans';
 import { propertyTypes } from '../data/property';
 import { m } from '../lib/url';
@@ -35,11 +35,12 @@ const needs = [
       <h2><span class="line"><span>{title[0]}</span></span><span class="line"><span><em>{title[1]}</em></span></span></h2>
       <p class="lead mt-2" style="color:rgba(252,251,246,.92)">{text}</p>
       <div class="btns mt-2">
-        <a class="btn" href={`tel:${site.phoneHref}`}><Icon name="phone" class="chev" /> {site.phone}</a>
+        {interest !== 'venture' && <a class="btn" href={telHref(site.finservPhone)}><Icon name="phone" class="chev" /> {interest ? '' : 'Finserv · '}{site.finservPhone}</a>}
+        {interest !== 'finserv' && <a class="btn" href={telHref(site.venturePhone)}><Icon name="phone" class="chev" /> {interest ? '' : 'Venture · '}{site.venturePhone}</a>}
       </div>
       {img && <img src={m(`img/${img}-sm.webp`)} alt="" loading="lazy" width="720" height="402" style="margin-top:2.5rem;border-radius:20px;opacity:.95" data-parallax />}
     </div>
-    <form class="form" data-enquiry novalidate>
+    <form class="form" data-enquiry novalidate data-wa-finserv={site.finservWa} data-wa-venture={site.ventureWa}>
       <input type="hidden" name="access_key" value={site.web3formsKey} />
       <input type="hidden" name="subject" value="New website enquiry — SINTEL" />
       <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this unchecked" />

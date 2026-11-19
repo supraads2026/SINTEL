@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Enquiry from '../components/Enquiry.astro';
+import TrackRecord from '../components/TrackRecord.astro';
 import { m, u } from '../lib/url';
 import { site } from '../data/site';
 const values = [
@@ -31,11 +32,14 @@ const values = [
         <h2 data-split>Rooted in <em>Bhubaneswar.</em></h2>
       </div>
       <div class="lead">
-        <p><mark class="todo">To confirm: 2–3 paragraphs from SINTEL — when the group started, why, and who it serves.</mark></p>
+        <p>Our journey in loans and property began in 2008. Today {site.legalName} is Odisha's first PAN-India corporate DSA (Direct Selling Agent), and we have served our customers from the same office on Lewis Road for the last 11 years.</p>
+        <p>We take the trust our customers place in us seriously: no funding we have arranged for our customers has defaulted since 2015, and we have a clean record with no compliance issues.</p>
         <p>{site.legalName} brings two specialist companies under one roof: {site.finserv}, which helps people and businesses find the right loan, and {site.venture}, which helps them buy and sell property. From our office on Lewis Road, we work with families and businesses across Bhubaneswar and Odisha.</p>
       </div>
     </div>
   </section>
+
+  <TrackRecord title={['Since 2008,', 'one address of trust.']} />
 
   <section class="section dark">
     <div class="wrap">

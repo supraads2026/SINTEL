@@ -16,7 +16,7 @@ const why = [
   { icon: 'key', t: 'Home-loan help', d: 'Dwarika Finserv can help you fund the purchase.' },
   { icon: 'handshake', t: 'Guidance till registration', d: 'We stay with you through booking and registration. TODO(SINTEL): confirm' },
 ];
-const schema = [{ '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: site.venture, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', telephone: site.phoneHref }];
+const schema = [{ '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: site.venture, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', telephone: site.venturePhone.replace(/\s/g, '') }];
 ---
 <Base title="Dwarika Venture | Property for Sale in Bhubaneswar" description="Flats, villas, plots and commercial property for sale in and around Bhubaneswar, with honest advice from Dwarika Venture." pageName="Dwarika Venture" schema={schema}>
   <section class="hero" aria-label="Dwarika Venture">

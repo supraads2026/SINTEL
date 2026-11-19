@@ -4,6 +4,7 @@ import Icon from '../components/Icon.astro';
 import HoverList from '../components/HoverList.astro';
 import Steps from '../components/Steps.astro';
 import Enquiry from '../components/Enquiry.astro';
+import TrackRecord from '../components/TrackRecord.astro';
 import PropertyCard from '../components/PropertyCard.astro';
 import { u, m } from '../lib/url';
 import { loans } from '../data/loans';
@@ -13,7 +14,7 @@ const statement = 'SINTEL Enterprises brings loans and property under one truste
 const why = [
   { icon: 'layers', t: 'Finance and property in one group', d: 'Find the home and the home loan, or fund the business and its premises, with one team.' },
   { icon: 'chat', t: 'Honest, plain-language guidance', d: 'We explain your options clearly, with no jargon and no pressure.' },
-  { icon: 'pin', t: 'Based in Bhubaneswar', d: 'A local team on Lewis Road that knows the city and its neighbourhoods.' },
+  { icon: 'pin', t: 'Based in Bhubaneswar', d: 'A local team at the same Lewis Road office for 11 years, who know the city and its neighbourhoods.' },
   { icon: 'phone', t: 'One call or WhatsApp away', d: 'Reach us the way that suits you, and we will call you back.' },
 ];
 const featured = properties.slice(0, 3);
@@ -179,6 +180,9 @@ const slides = [
       </div>
     </div>
   </section>
+
+  <!-- 7b · Track record -->
+  <TrackRecord />
 
   <!-- 8 · Enquiry -->
   <Enquiry img="img-04-sintel-towers" />

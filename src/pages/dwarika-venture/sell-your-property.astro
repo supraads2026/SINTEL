@@ -4,9 +4,9 @@ import PageHero from '../../components/PageHero.astro';
 import Icon from '../../components/Icon.astro';
 import Steps from '../../components/Steps.astro';
 import Disclaimer from '../../components/Disclaimer.astro';
-import { site } from '../../data/site';
+import { site, waLink } from '../../data/site';
 import { propertyTypes } from '../../data/property';
-const wa = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent('Hi Dwarika Venture, I want to sell my property.')}`;
+const wa = waLink('Hi Dwarika Venture, I want to sell my property.', 'venture');
 ---
 <Base title="Sell Your Property in Bhubaneswar | Dwarika Venture" description="List your flat, house, plot or commercial space with Dwarika Venture. We market it to genuine buyers and assist you till registration." pageName="Sell Your Property" image="img/img-v5-sell-property.webp">
   <PageHero eyebrow="Dwarika Venture · For owners" h1={['Sell with', 'confidence.']} lead="List your flat, house, plot or commercial space with Dwarika Venture." img="img-v5-sell-property" crumbs={[{ href: '/dwarika-venture/', name: 'Dwarika Venture' }]}>

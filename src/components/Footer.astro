@@ -4,7 +4,7 @@ import Icon from './Icon.astro';
 import { u } from '../lib/url';
 import { loans } from '../data/loans';
 import { propertyTypes } from '../data/property';
-import { site } from '../data/site';
+import { site, telHref, waLink } from '../data/site';
 const year = new Date().getFullYear();
 const socials = Object.entries(site.social).filter(([, v]) => v);
 const iconFor: Record<string, string> = { instagram: 'ig', facebook: 'fb', linkedin: 'in', x: 'x' };
@@ -15,8 +15,8 @@ const iconFor: Record<string, string> = { instagram: 'ig', facebook: 'fb', linke
     <div class="f-grid">
       <div>
         <a class="brand" href={u('/')} aria-label="SINTEL Enterprises home"><Mark /><span><span class="brand-word">SINTEL</span><span class="brand-sub">ENTERPRISES</span></span></a>
-        <p style="margin-top:22px">{site.addressLines.join(', ')}<br />{site.hours}</p>
-        <p><a href={`tel:${site.phoneHref}`}>{site.phone}</a><br /><a href={`mailto:${site.email}`}>{site.email}</a></p>
+        <p style="margin-top:22px">{site.addressLines.map((l) => <>{l}<br /></>)}{site.hours}</p>
+        <p>Office: <a href={telHref(site.landlineHref)}>{site.landline}</a><br />{site.finserv}: <a href={telHref(site.finservPhone)}>{site.finservPhone}</a><br />{site.venture}: <a href={telHref(site.venturePhone)}>{site.venturePhone}</a><br /><a href={`mailto:${site.email}`}>{site.email}</a></p>
         {socials.length > 0 && <div class="socials">{socials.map(([k, v]) => <a href={v} target="_blank" rel="noopener" aria-label={k}><Icon name={iconFor[k]} class="chev" /></a>)}</div>}
       </div>
       <div>
@@ -36,7 +36,8 @@ const iconFor: Record<string, string> = { instagram: 'ig', facebook: 'fb', linke
         <ul>
           <li><a href={u('/about/')}>About</a></li>
           <li><a href={u('/contact/')}>Contact</a></li>
-          <li><a href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener">WhatsApp</a></li>
+          <li><a href={waLink(`Hi ${site.finserv}, I would like to know about a loan.`, 'finserv')} target="_blank" rel="noopener">WhatsApp Finserv</a></li>
+          <li><a href={waLink(`Hi ${site.venture}, I would like to know about a property.`, 'venture')} target="_blank" rel="noopener">WhatsApp Venture</a></li>
         </ul>
       </div>
     </div>
