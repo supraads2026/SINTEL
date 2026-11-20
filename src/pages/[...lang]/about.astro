@@ -1,0 +1,114 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import Enquiry from '../../components/Enquiry.astro';
+import TrackRecord from '../../components/TrackRecord.astro';
+import { m } from '../../lib/url';
+import Reviews from '../../components/Reviews.astro';
+import Partners from '../../components/Partners.astro';
+import { site, team } from '../../data/site';
+import { SHOW_TODOS } from '../../lib/text';
+import { langPaths, lu, useT, type Lang } from '../../i18n';
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const t = useT(lang);
+const a = t.about;
+const u = (p: string) => lu(lang, p);
+const role = (r: string) => t.roles[r] ?? r;
+const initials = (n: string) => n.split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join('');
+const [lead, ...rest] = team;
+const valueIcons = ['shield', 'eye', 'compass', 'growth'];
+const values = a.valueList.map((v, i) => ({ icon: valueIcons[i], ...v }));
+---
+<Base title={a.title} description={a.description} pageName={a.pageName}>
+  <!-- Tower turns as you scroll (VID-04 scrubbed by scroll position) -->
+  <section class="tower-scrub" data-scrub aria-label={a.pageName}>
+    <div class="pin">
+      <video muted playsinline preload="none" aria-hidden="true"><source src={m('video/vid-04-about-tower-orbit-scrub.mp4')} type="video/mp4" /></video>
+      <img src={m('img/img-04-about-orbit-poster.webp')} alt={a.towerAlt} width="1280" height="720" fetchpriority="high" />
+      <div class="copy"><div class="wrap">
+        <p class="eyebrow" data-hero-in>{a.pageName}</p>
+        <h1 class="hero-h1"><span class="line"><span>{a.h1[0]}</span></span><span class="line"><span><em>{a.h1[1]}</em></span></span></h1>
+      </div></div>
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap two-col">
+      <div>
+        <p class="eyebrow">{a.story}</p>
+        <h2 data-split>{a.storyH[0]} <em>{a.storyH[1]}</em></h2>
+      </div>
+      <div class="lead">
+        {a.storyP.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <TrackRecord title={a.trackH} />
+
+  <section class="section dark">
+    <div class="wrap">
+      <div class="two-col">
+        <div data-reveal><p class="eyebrow">{a.vision}</p><p class="statement" style="font-size:clamp(1.6rem,3vw,2.6rem)" set:html={a.visionHtml} /></div>
+        <div data-reveal><p class="eyebrow">{a.mission}</p><p class="statement" style="font-size:clamp(1.6rem,3vw,2.6rem)" set:html={a.missionHtml} /></div>
+      </div>
+      {SHOW_TODOS && <p class="mt-3"><mark class="todo">To confirm: vision and mission wording</mark></p>}
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap two-col" style="align-items:center">
+      <div class="portrait" data-reveal>
+        {lead.photo
+          ? <img src={m(`team/${lead.photo}`)} alt={`${lead.name}, ${role(lead.role)}`} width="600" height="750" loading="lazy" />
+          : <span class="mono" aria-hidden="true">{initials(lead.name)}</span>}
+      </div>
+      <div>
+        <p class="eyebrow">{a.leadership}</p>
+        <h2 data-split>{lead.name}</h2>
+        <p class="lead muted mt-2">{role(lead.role)}, {site.legalName}</p>
+        <p class="muted">{lead.bio || a.leadBio(lead.name)}</p>
+        {SHOW_TODOS && !lead.photo && <p><mark class="todo">To confirm: photo, designation and a short note</mark></p>}
+        {rest.length > 0 && (
+          <ul class="team mt-3">
+            {rest.map((p) => (
+              <li>
+                {p.photo ? <img src={m(`team/${p.photo}`)} alt="" width="96" height="96" loading="lazy" /> : <span class="mono sm" aria-hidden="true">{initials(p.name)}</span>}
+                <span><b>{p.name}</b><span class="muted">{role(p.role)}</span>{p.bio && <span class="muted">{p.bio}</span>}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="section dark deep">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{a.group}</p><h2 data-split>{a.groupH[0]} <em>{a.groupH[1]}</em></h2></div>
+      <div class="org" data-reveal>
+        <div class="top"><b>SINTEL</b><span class="muted" style="font-size:.8rem;letter-spacing:.24em">ENTERPRISES</span></div>
+        <div class="stem"></div>
+        <div class="arm"></div>
+        <div class="kids">
+          <a class="kid" href={u('/dwarika-finserv/')}><b>Dwarika Finserv</b><span>{t.home.finText}</span></a>
+          <a class="kid" href={u('/dwarika-venture/')}><b>Dwarika Venture</b><span>{t.home.venText}</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{a.values}</p><h2 data-split>{a.valuesH[0]} <em>{a.valuesH[1]}</em></h2></div>
+      <div class="cards">{values.map((v) => <div class="card" data-reveal><span class="icon"><Icon name={v.icon} /></span><h3>{v.t}</h3><p>{v.d}</p></div>)}</div>
+    </div>
+  </section>
+
+  <Reviews />
+  <Partners />
+
+  <Enquiry title={a.enquiryH} />
+</Base>

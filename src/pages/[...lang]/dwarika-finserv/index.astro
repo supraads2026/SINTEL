@@ -1,0 +1,75 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Icon from '../../../components/Icon.astro';
+import HoverList from '../../../components/HoverList.astro';
+import Steps from '../../../components/Steps.astro';
+import Faq from '../../../components/Faq.astro';
+import Partners from '../../../components/Partners.astro';
+import Enquiry from '../../../components/Enquiry.astro';
+import Disclaimer from '../../../components/Disclaimer.astro';
+import { m } from '../../../lib/url';
+import { site, postalAddress } from '../../../data/site';
+import { langPaths, lp, useT, type Lang } from '../../../i18n';
+import { loansFor } from '../../../i18n/data';
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const t = useT(lang);
+const f = t.finserv;
+const loans = loansFor(lang);
+
+const docIcons = ['shield', 'doc', 'layers', 'home'];
+const docs = f.docs.map((d, i) => ({ icon: docIcons[i], ...d }));
+const schema = [{ '@context': 'https://schema.org', '@type': 'FinancialService', name: site.finserv, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', address: postalAddress, url: new URL(Astro.url.pathname, Astro.site).href, telephone: site.finservPhone.replace(/\s/g, ''),
+  hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Loans', itemListElement: loans.map((l) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: l.name } })) } }];
+---
+<Base title={f.title} description={f.description} pageName="Dwarika Finserv" schema={schema}>
+  <section class="hero" aria-label="Dwarika Finserv">
+    <div class="hero-media">
+      <div class="stage">
+        <img class="poster" src={m('img/vid-02-finserv-hero-poster.webp')} srcset={`${m('img/vid-02-finserv-hero-poster-m.webp')} 960w, ${m('img/vid-02-finserv-hero-poster.webp')} 1280w`} sizes="100vw" alt="" width="1280" height="720" fetchpriority="high" transition:name="hero-finserv" />
+        <video data-hero-video muted playsinline loop preload="none" poster={m('img/vid-02-finserv-hero-poster.webp')} aria-hidden="true"><source src={m('video/vid-02-finserv-hero-m.mp4')} type="video/mp4" media="(max-width: 900px)" /><source src={m('video/vid-02-finserv-hero.mp4')} type="video/mp4" /></video>
+      </div>
+    </div>
+    <div class="wrap hero-content">
+      <p class="eyebrow" data-hero-in>Dwarika Finserv</p>
+      <h1><span class="line"><span>{f.h1[0]}</span></span><span class="line"><span><em>{f.h1[1]}</em></span></span></h1>
+      <p class="lead" data-hero-in>{f.lead}</p>
+      <div class="btns" data-hero-in><a class="btn btn-gold magnetic" href="#enquire">{f.talk} <Icon name="arrow" class="chev arr" /></a></div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true">{t.common.scroll}<i></i></div>
+  </section>
+
+  <section class="section dark deep">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{f.seven}</p><h2 data-split>{f.chooseH[0]} <em>{f.chooseH[1]}</em></h2></div>
+      <HoverList items={loans.map((l) => ({ href: lp(lang, `/dwarika-finserv/${l.slug}/`), title: l.name, desc: l.oneLiner, img: l.img }))} />
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{t.common.howItWorks}</p><h2 data-split>{f.stepsH[0]} <em>{f.stepsH[1]}</em></h2></div>
+      <Steps steps={f.steps} />
+    </div>
+  </section>
+
+  <section class="section dark">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{f.documents}</p><h2 data-split>{f.docsH[0]} <em>{f.docsH[1]}</em></h2><p class="muted">{f.docsNote}</p></div>
+      <div class="cards">{docs.map((d) => <div class="card" data-reveal><span class="icon"><Icon name={d.icon} /></span><h3>{d.t}</h3><p>{d.d}</p></div>)}</div>
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap two-col">
+      <div class="sec-head"><p class="eyebrow">{t.common.faqs}</p><h2 data-split>{f.faqH[0]} <em>{f.faqH[1]}</em></h2></div>
+      <Faq faqs={f.faqs} />
+    </div>
+  </section>
+
+  <Partners />
+
+  <Enquiry interest="finserv" title={f.enquiryH} />
+  <Disclaimer />
+</Base>

@@ -8,6 +8,7 @@ import Mark from '../components/Mark.astro';
 import Icon from '../components/Icon.astro';
 import { site, postalAddress, sameAs } from '../data/site';
 import { m } from '../lib/url';
+import { LANGS, langFromUrl, langMeta, alternates, useT } from '../i18n';
 
 interface Props {
   title: string;
@@ -18,6 +19,13 @@ interface Props {
   noindex?: boolean;
 }
 const { title, description, pageName, image = 'og.jpg', schema = [], noindex = false } = Astro.props;
+const lang = langFromUrl(Astro.url);
+const t = useT(lang);
+const alt = alternates(Astro.url);
+// Odia and Hindi pages also load a Noto font for their script (English pages load exactly what they did before).
+const scriptFont = lang === 'or' ? '&family=Noto+Sans+Oriya:wght@400;500;600;700' : lang === 'hi' ? '&family=Noto+Sans+Devanagari:wght@400;500;600;700' : '';
+const fonts = `https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500${scriptFont}&display=swap`;
+const sfx = lang === 'en' ? '' : `-${lang}`; // persisted header/menu are per language
 const fullTitle = title.includes('SINTEL') || title.includes('|') ? title : `${title} | SINTEL Enterprises`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(m(image), Astro.site);
@@ -35,13 +43,15 @@ const org = {
 };
 ---
 <!doctype html>
-<html lang="en-IN" class="no-js">
+<html lang={langMeta[lang].html} class="no-js">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {alt.localized && LANGS.map((l) => <link rel="alternate" hreflang={langMeta[l].html} href={new URL(alt.href[l], Astro.site)} />)}
+    {alt.localized && <link rel="alternate" hreflang="x-default" href={new URL(alt.href.en, Astro.site)} />}
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#073B2B" />
     <link rel="icon" href={m('favicon.svg')} type="image/svg+xml" />
@@ -54,9 +64,9 @@ const org = {
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" /></noscript>
+    <link rel="preload" as="style" href={fonts} />
+    <link href={fonts} rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href={fonts} rel="stylesheet" /></noscript>
     <script is:inline>
       (function () {
         var d = document.documentElement;
@@ -96,11 +106,11 @@ const org = {
     <ClientRouter fallback="swap" />
   </head>
   <body>
-    <a class="skip" href="#main">Skip to content</a>
+    <a class="skip" href="#main">{t.common.skip}</a>
 
-    <div class="preloader" id="preloader" aria-hidden="true" transition:persist="preloader">
+    <div class="preloader" id="preloader" aria-hidden="true" transition:persist={`preloader${sfx}`}>
       <Mark class="mark" />
-      <span class="cap">Building opportunities…</span>
+      <span class="cap">{t.common.preloader}</span>
       <span class="count" id="pl-count">00</span>
       <span class="bar" id="pl-bar"></span>
     </div>
@@ -118,7 +128,7 @@ const org = {
     <Footer />
 
     <WaFloat />
-    <button class="to-top" type="button" aria-label="Back to top" transition:persist="totop"><Icon name="up" class="chev" /></button>
+    <button class="to-top" type="button" aria-label={t.common.backToTop} transition:persist={`totop${sfx}`}><Icon name="up" class="chev" /></button>
 
     <script>
       import '../scripts/main';

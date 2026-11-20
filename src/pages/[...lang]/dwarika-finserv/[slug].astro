@@ -1,0 +1,107 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PageHero from '../../../components/PageHero.astro';
+import Icon from '../../../components/Icon.astro';
+import Steps from '../../../components/Steps.astro';
+import Faq from '../../../components/Faq.astro';
+import Related from '../../../components/Related.astro';
+import Enquiry from '../../../components/Enquiry.astro';
+import Disclaimer from '../../../components/Disclaimer.astro';
+import { loans as loansEn } from '../../../data/loans';
+import { site, waLink } from '../../../data/site';
+import { langPaths, lp, useT, type Lang } from '../../../i18n';
+import { loansFor } from '../../../i18n/data';
+
+export function getStaticPaths() {
+  return langPaths().flatMap(({ params, props }) =>
+    loansEn.map((l) => ({ params: { ...params, slug: l.slug }, props: { ...props, slug: l.slug } })));
+}
+const { lang, slug } = Astro.props as { lang: Lang; slug: string };
+const t = useT(lang);
+const tl = t.loan;
+const loans = loansFor(lang);
+const i = loans.findIndex((l) => l.slug === slug);
+const loan = loans[i];
+const nameEn = loansEn[i].name; // form values stay English for SINTEL's inbox
+const related = [1, 2, 3].map((k) => loans[(i + k) % loans.length]);
+const schema = [
+  { '@context': 'https://schema.org', '@type': 'Service', name: tl.service(loan.name), serviceType: 'Loan advisory', provider: { '@type': 'FinancialService', name: site.finserv }, areaServed: 'Bhubaneswar, Odisha', description: loan.oneLiner },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: loan.faqs.filter((f) => !f.a.includes('TODO')).map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+];
+---
+<Base title={tl.title(loan.name)} description={loan.description} pageName={loan.name} image={`img/${loan.img}.webp`} schema={schema}>
+  <PageHero eyebrow="Dwarika Finserv" h1={loan.h1} lead={loan.oneLiner} img={loan.img} crumbs={[{ href: '/dwarika-finserv/', name: 'Dwarika Finserv' }]}>
+    <div class="btns">
+      <a class="btn btn-gold magnetic" href="#enquire">{tl.enquire} <Icon name="arrow" class="chev arr" /></a>
+      <a class="btn" href={waLink(tl.waAbout(loan.name), 'finserv')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> {t.common.whatsapp}</a>
+    </div>
+  </PageHero>
+
+  <section class="section ivory">
+    <div class="wrap two-col">
+      <div>
+        <p class="eyebrow">{tl.whoFor}</p>
+        <h2 data-split>{loan.whoFor}.</h2>
+        <ul class="check-list mt-2">{loan.whoForList.map((w) => <li data-reveal>{w}</li>)}</ul>
+      </div>
+      <div>
+        <p class="eyebrow">{tl.useFor}</p>
+        <div class="chips mt-2">{loan.uses.map((use) => <span class="chip" data-reveal>{use}</span>)}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section dark" id="eligibility">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{tl.factsEyebrow}</p><h2 data-split>{tl.factsH[0]} <em>{tl.factsH[1]}</em></h2></div>
+      <div class="loan-facts">
+        <div class="lf" data-reveal>
+          <h3><Icon name="shield" class="chev" /> {tl.eligibility}</h3>
+          <ul class="check-list">{loan.eligibility.map((e) => <li>{e}</li>)}</ul>
+          <p class="muted lf-note">{tl.eligNote}</p>
+        </div>
+        <div class="lf" data-reveal>
+          <h3><Icon name="doc" class="chev" /> {tl.docs}</h3>
+          <ul class="check-list">{loan.docs.map((d) => <li>{d}</li>)}</ul>
+          <p class="muted lf-note">{tl.docsNote}</p>
+        </div>
+        <div class="lf lf-rate" data-reveal>
+          <h3><Icon name="growth" class="chev" /> {tl.rate}</h3>
+          {loan.rate ? (
+            <>
+              <p class="rate">{loan.rate}</p>
+              <p class="muted">{tl.rateNote}</p>
+            </>
+          ) : (
+            <p class="muted">{tl.rateNone}</p>
+          )}
+          <a class="btn btn-gold btn-sm mt-1" href={waLink(tl.waRates(loan.name), 'finserv')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> {tl.askRates}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{t.common.howItWorks}</p><h2 data-split>{tl.stepsH[0]} <em>{tl.stepsH[1]}</em></h2></div>
+      <Steps steps={tl.steps(loan.name)} />
+    </div>
+  </section>
+
+  <section class="section ivory" style="padding-top:0">
+    <div class="wrap two-col">
+      <div class="sec-head"><p class="eyebrow">{t.common.faqs}</p><h2 data-split>{tl.faqH(loan.name)[0]} <em>{tl.faqH(loan.name)[1]}</em></h2></div>
+      <Faq faqs={loan.faqs} />
+    </div>
+  </section>
+
+  <section class="section ivory" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{tl.related}</p><h2 data-split>{tl.relatedH[0]} <em>{tl.relatedH[1]}</em></h2></div>
+      <Related items={related.map((r) => ({ href: lp(lang, `/dwarika-finserv/${r.slug}/`), title: r.name, desc: r.oneLiner, img: r.img }))} />
+    </div>
+  </section>
+
+  <Enquiry interest="finserv" need={nameEn} title={tl.enquiryH(loan.name)} />
+  <Disclaimer />
+</Base>

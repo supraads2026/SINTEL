@@ -1,0 +1,94 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import Enquiry from '../../components/Enquiry.astro';
+import { m } from '../../lib/url';
+import { site, telHref, waLink } from '../../data/site';
+import { langPaths, useT, type Lang } from '../../i18n';
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const t = useT(lang);
+const c = t.contact;
+const schema = [{ '@context': 'https://schema.org', '@type': 'LocalBusiness', name: site.legalName, telephone: site.landlineHref, ...(site.email ? { email: site.email } : {}),
+  url: new URL(import.meta.env.BASE_URL, Astro.site).href, hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapQuery)}`,
+  openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], opens: '10:00', closes: '18:00' }],
+  areaServed: 'Bhubaneswar, Odisha',
+  address: { '@type': 'PostalAddress', streetAddress: site.streetAddress, addressLocality: site.city, addressRegion: site.region, postalCode: site.postalCode, addressCountry: 'IN' },
+  image: new URL(m('og.jpg'), Astro.site).href }];
+const companies = [
+  { t: site.finserv, s: c.loansFunding, phone: site.finservPhone, wa: waLink(t.common.waLoan(site.finserv), 'finserv') },
+  { t: site.venture, s: c.property, phone: site.venturePhone, wa: waLink(t.common.waProperty(site.venture), 'venture') },
+];
+const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.mapQuery)}&z=17&output=embed`;
+const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapQuery)}`;
+const directionsLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(site.mapQuery)}`;
+---
+<Base title={c.title} description={c.description} pageName={c.pageName} schema={schema}>
+  <PageHero eyebrow={c.eyebrow} h1={c.h1} lead={c.lead} img="img-07-contact-pin" wide>
+    <div class="btns">
+      <a class="btn btn-gold magnetic" href="#enquire">{c.sendEnquiry} <Icon name="arrow" class="chev arr" /></a>
+      <a class="btn" href={telHref(site.landlineHref)}><Icon name="phone" class="chev" /> {site.landline}</a>
+      <a class="btn" href="#map"><Icon name="pin" class="chev" /> {c.getDirections}</a>
+    </div>
+  </PageHero>
+
+  <section class="section ivory">
+    <div class="wrap">
+      <h2 class="sr-only">{c.details}</h2>
+      <div class="cards contact-cards">
+        <div class="card" data-reveal>
+          <span class="icon"><Icon name="pin" /></span>
+          <h3>{c.office}</h3>
+          <p>{site.addressLines.map((l) => <>{l}<br /></>)}</p>
+          <p class="mt-1"><a class="link-arrow" href={directionsLink} target="_blank" rel="noopener" data-track="directions">{c.directions} <Icon name="arrow" class="chev arr" /></a></p>
+        </div>
+        <div class="card" data-reveal>
+          <span class="icon"><Icon name="phone" /></span>
+          <h3>{c.landline}</h3>
+          <p><a href={telHref(site.landlineHref)}>{site.landline}</a></p>
+          <p class="muted">{t.common.hours}</p>
+        </div>
+        {companies.map((co) => (
+          <div class="card" data-reveal>
+            <span class="icon"><Icon name="wa" /></span>
+            <h3>{co.t}</h3>
+            <p class="muted">{co.s} · {c.callOrWa}</p>
+            <p><a href={telHref(co.phone)}>{co.phone}</a></p>
+            <p class="mt-1"><a class="link-arrow" href={co.wa} target="_blank" rel="noopener">{t.common.chatWa} <Icon name="arrow" class="chev arr" /></a></p>
+          </div>
+        ))}
+        <div class="card director" data-reveal>
+          <span class="icon"><Icon name="phone" /></span>
+          <h3>{c.director}</h3>
+          <p class="muted">{site.founder}</p>
+          <p><a href={telHref(site.directorPhone)}>{site.directorPhone}</a></p>
+          <p class="mt-1"><a class="link-arrow" href={`https://wa.me/${site.directorWa}`} target="_blank" rel="noopener">{t.common.whatsapp} <Icon name="arrow" class="chev arr" /></a></p>
+        </div>
+        {site.email && (
+          <div class="card" data-reveal>
+            <span class="icon"><Icon name="mail" /></span>
+            <h3>{c.email}</h3>
+            <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+          </div>
+        )}
+      </div>
+      <div class="map-head mt-3" id="map">
+        <div>
+          <p class="eyebrow">{c.findUs}</p>
+          <h2 class="h3">{c.findUsH}</h2>
+        </div>
+        <div class="btns">
+          <a class="btn btn-gold magnetic" href={directionsLink} target="_blank" rel="noopener" data-track="directions"><Icon name="pin" class="chev" /> {c.getDirections}</a>
+          <a class="btn btn-line-dk" href={mapsLink} target="_blank" rel="noopener">{c.openMaps}</a>
+        </div>
+      </div>
+      <div class="map-embed mt-2">
+        <iframe title={c.mapTitle(site.legalName)} src={mapSrc} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
+  <Enquiry />
+</Base>

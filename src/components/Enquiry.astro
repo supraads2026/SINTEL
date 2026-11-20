@@ -4,6 +4,10 @@ import { site, telHref } from '../data/site';
 import { loans } from '../data/loans';
 import { propertyTypes } from '../data/property';
 import { m } from '../lib/url';
+import { langFromUrl, langMeta, useT } from '../i18n';
+import { loansFor, propertyTypesFor } from '../i18n/data';
+const lang = langFromUrl(Astro.url);
+const t = useT(lang);
 interface Props {
   title?: [string, string];
   text?: string;
@@ -14,29 +18,32 @@ interface Props {
   id?: string;
 }
 const {
-  title = ['Tell us', 'what you need.'],
-  text = 'Share a few details and our team will call you back. Prefer chatting? Message us on WhatsApp.',
+  title = t.enquiry.h,
+  text = t.enquiry.text,
   interest = '',
   need = '',
   bg = 'green',
   img,
   id = 'enquire',
 } = Astro.props;
+const loansL = loansFor(lang);
+const typesL = propertyTypesFor(lang);
 const needs = [
-  ...loans.map((l) => ({ v: l.name, g: 'finserv' })),
-  ...propertyTypes.map((t) => ({ v: `Buy: ${t.name}`, g: 'venture' })),
-  { v: 'Sell my property', g: 'venture' },
+  ...loans.map((l, i) => ({ v: l.name, label: loansL[i].name, g: 'finserv' })),
+  ...propertyTypes.map((p, i) => ({ v: `Buy: ${p.name}`, label: t.enquiry.buy(typesL[i].name), g: 'venture' })),
+  { v: 'Sell my property', label: t.enquiry.sellMine, g: 'venture' },
 ];
+
 ---
 <section class:list={['section', bg === 'green' ? 'green' : 'dark']} id={id}>
   <div class="wrap enquiry">
     <div>
-      <p class="eyebrow">Enquire</p>
+      <p class="eyebrow">{t.common.enquire}</p>
       <h2><span class="line"><span>{title[0]}</span></span><span class="line"><span><em>{title[1]}</em></span></span></h2>
       <p class="lead mt-2" style="color:rgba(252,251,246,.92)">{text}</p>
       <div class="btns mt-2">
-        {interest !== 'venture' && <a class="btn" href={telHref(site.finservPhone)}><Icon name="phone" class="chev" /> {interest ? '' : 'Finserv · '}{site.finservPhone}</a>}
-        {interest !== 'finserv' && <a class="btn" href={telHref(site.venturePhone)}><Icon name="phone" class="chev" /> {interest ? '' : 'Venture · '}{site.venturePhone}</a>}
+        {interest !== 'venture' && <a class="btn" href={telHref(site.finservPhone)}><Icon name="phone" class="chev" /> {interest ? '' : t.enquiry.finservPrefix}{site.finservPhone}</a>}
+        {interest !== 'finserv' && <a class="btn" href={telHref(site.venturePhone)}><Icon name="phone" class="chev" /> {interest ? '' : t.enquiry.venturePrefix}{site.venturePhone}</a>}
       </div>
       {img && <img src={m(`img/${img}-sm.webp`)} alt="" loading="lazy" width="720" height="402" style="margin-top:2.5rem;border-radius:20px;opacity:.95" data-parallax />}
     </div>
@@ -44,29 +51,30 @@ const needs = [
       <input type="hidden" name="access_key" value={site.web3formsKey} />
       <input type="hidden" name="subject" value="New website enquiry — SINTEL" />
       <input type="hidden" name="page" value={Astro.url.pathname} />
-      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this unchecked" />
-      <div class="field"><label for={`${id}-name`}>Name</label><input id={`${id}-name`} name="name" required autocomplete="name" placeholder="Your full name" /></div>
-      <div class="field"><label for={`${id}-mobile`}>Mobile</label><input id={`${id}-mobile`} name="mobile" required type="tel" inputmode="tel" autocomplete="tel" placeholder="10-digit mobile" pattern="[0-9+ ]{10,15}" title="10-digit mobile number" /></div>
-      <div class="field"><label for={`${id}-int`}>I'm interested in</label>
+      {lang !== 'en' && <input type="hidden" name="language" value={langMeta[lang].wa} />}
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label={t.enquiry.botcheck} />
+      <div class="field"><label for={`${id}-name`}>{t.enquiry.name}</label><input id={`${id}-name`} name="name" required autocomplete="name" placeholder={t.enquiry.namePh} /></div>
+      <div class="field"><label for={`${id}-mobile`}>{t.enquiry.mobile}</label><input id={`${id}-mobile`} name="mobile" required type="tel" inputmode="tel" autocomplete="tel" placeholder={t.enquiry.mobilePh} pattern="[0-9+ ]{10,15}" title={t.enquiry.mobileTitle} /></div>
+      <div class="field"><label for={`${id}-int`}>{t.enquiry.interested}</label>
         <select id={`${id}-int`} name="interested_in" required>
-          <option value="" disabled selected={!interest}>Choose one</option>
-          <option value="Dwarika Finserv (loans)" selected={interest === 'finserv'}>Dwarika Finserv (loans)</option>
-          <option value="Dwarika Venture (property)" selected={interest === 'venture'}>Dwarika Venture (property)</option>
+          <option value="" disabled selected={!interest}>{t.enquiry.choose}</option>
+          <option value="Dwarika Finserv (loans)" selected={interest === 'finserv'}>{t.enquiry.optFinserv}</option>
+          <option value="Dwarika Venture (property)" selected={interest === 'venture'}>{t.enquiry.optVenture}</option>
         </select>
       </div>
-      <div class="field"><label for={`${id}-need`}>Loan type or property need</label>
+      <div class="field"><label for={`${id}-need`}>{t.enquiry.need}</label>
         <select id={`${id}-need`} name="need">
-          <option value="" selected={!need}>Not sure yet</option>
-          <optgroup label="Dwarika Finserv">{needs.filter((n) => n.g === 'finserv').map((n) => <option selected={need === n.v}>{n.v}</option>)}</optgroup>
-          <optgroup label="Dwarika Venture">{needs.filter((n) => n.g === 'venture').map((n) => <option selected={need === n.v}>{n.v}</option>)}</optgroup>
+          <option value="" selected={!need}>{t.enquiry.notSure}</option>
+          <optgroup label="Dwarika Finserv">{needs.filter((n) => n.g === 'finserv').map((n) => (n.label === n.v ? <option selected={need === n.v}>{n.v}</option> : <option value={n.v} selected={need === n.v}>{n.label}</option>))}</optgroup>
+          <optgroup label="Dwarika Venture">{needs.filter((n) => n.g === 'venture').map((n) => (n.label === n.v ? <option selected={need === n.v}>{n.v}</option> : <option value={n.v} selected={need === n.v}>{n.label}</option>))}</optgroup>
           {need && !needs.some((n) => n.v === need) && <option selected>{need}</option>}
         </select>
       </div>
-      <div class="field full"><label for={`${id}-msg`}>Message</label><textarea id={`${id}-msg`} name="message" rows="4" placeholder="Anything you'd like us to know (optional)"></textarea></div>
-      <label class="consent full"><input type="checkbox" name="consent" required /> <span>I agree to be contacted by SINTEL Enterprises by phone, WhatsApp or email about my enquiry.</span></label>
+      <div class="field full"><label for={`${id}-msg`}>{t.enquiry.message}</label><textarea id={`${id}-msg`} name="message" rows="4" placeholder={t.enquiry.messagePh}></textarea></div>
+      <label class="consent full"><input type="checkbox" name="consent" required /> <span>{t.enquiry.consent}</span></label>
       <div class="btns full">
-        <button class="btn btn-gold magnetic" type="submit">Send enquiry <Icon name="arrow" class="chev arr" /></button>
-        <button class="btn" type="button" data-wa-send><Icon name="wa" class="chev" /> Chat on WhatsApp</button>
+        <button class="btn btn-gold magnetic" type="submit">{t.enquiry.send} <Icon name="arrow" class="chev arr" /></button>
+        <button class="btn" type="button" data-wa-send><Icon name="wa" class="chev" /> {t.common.chatWa}</button>
       </div>
       <p class="form-status full" role="status" aria-live="polite"></p>
     </form>

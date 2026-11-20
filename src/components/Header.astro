@@ -1,69 +1,81 @@
 ---
 import Mark from './Mark.astro';
 import Icon from './Icon.astro';
-import { u, m } from '../lib/url';
-import { loans } from '../data/loans';
-import { propertyTypes } from '../data/property';
+import { m } from '../lib/url';
 import { site, waLink } from '../data/site';
-const path = Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '') || '/';
+import { LANGS, langFromUrl, langMeta, alternates, lu, stripLang, useT } from '../i18n';
+import { loansFor, propertyTypesFor } from '../i18n/data';
+const lang = langFromUrl(Astro.url);
+const t = useT(lang);
+const loans = loansFor(lang);
+const propertyTypes = propertyTypesFor(lang);
+const alt = alternates(Astro.url).href;
+const path = stripLang(Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '') || '/');
 const isIn = (p: string) => path.startsWith(p);
+const sfx = lang === 'en' ? '' : `-${lang}`; // a language switch swaps in that language's header and menu
 const ventureLinks = [
-  ...propertyTypes.map((t) => ({ href: `/dwarika-venture/${t.slug}/`, name: t.name, img: t.img })),
-  { href: '/dwarika-venture/sell-your-property/', name: 'Sell Your Property', img: 'img-v5-sell-property' },
-  { href: "/dwarika-venture/buyers-guide/", name: "Buyer's Guide", img: 'img-v6-buyers-guide' },
+  ...propertyTypes.map((p) => ({ href: `/dwarika-venture/${p.slug}/`, name: p.name, img: p.img })),
+  { href: '/dwarika-venture/sell-your-property/', name: t.nav.sellProperty, img: 'img-v5-sell-property' },
+  { href: '/dwarika-venture/buyers-guide/', name: t.nav.buyersGuide, img: 'img-v6-buyers-guide' },
 ];
 ---
-<header class="site-header" id="site-header" transition:persist="header">
+<header class="site-header" id="site-header" transition:persist={`header${sfx}`}>
   <div class="wrap">
-    <a class="brand" href={u('/')} aria-label="SINTEL Enterprises home">
+    <a class="brand" href={lu(lang, '/')} aria-label={t.common.brandHome}>
       <Mark />
       <span><span class="brand-word">SINTEL</span><span class="brand-sub">ENTERPRISES</span></span>
     </a>
 
-    <nav class="nav" aria-label="Main">
-      <div class:list={['nav-item', { active: isIn('/about') }]}><a class="nav-link" href={u('/about/')}>About</a></div>
+    <nav class="nav" aria-label={t.nav.main}>
+      <div class:list={['nav-item', { active: isIn('/about') }]}><a class="nav-link" href={lu(lang, '/about/')}>{t.nav.about}</a></div>
       <div class:list={['nav-item', { active: isIn('/dwarika-finserv') }]}>
-        <a class="nav-link" href={u('/dwarika-finserv/')}>Dwarika Finserv <Icon name="chev" class="chev" /></a>
+        <a class="nav-link" href={lu(lang, '/dwarika-finserv/')}>Dwarika Finserv <Icon name="chev" class="chev" /></a>
         <div class="dropdown">
-          {loans.map((l) => <a href={u(`/dwarika-finserv/${l.slug}/`)}><img src={m(`img/${l.img}-sm.webp`)} alt="" loading="lazy" width="34" height="34" />{l.name}</a>)}
-          <a class="dd-all" href={u('/dwarika-finserv/')}>All loans <Icon name="arrow" class="chev" /></a>
+          {loans.map((l) => <a href={lu(lang, `/dwarika-finserv/${l.slug}/`)}><img src={m(`img/${l.img}-sm.webp`)} alt="" loading="lazy" width="34" height="34" />{l.name}</a>)}
+          <a class="dd-all" href={lu(lang, '/dwarika-finserv/')}>{t.nav.allLoans} <Icon name="arrow" class="chev" /></a>
         </div>
       </div>
       <div class:list={['nav-item', { active: isIn('/dwarika-venture') }]}>
-        <a class="nav-link" href={u('/dwarika-venture/')}>Dwarika Venture <Icon name="chev" class="chev" /></a>
+        <a class="nav-link" href={lu(lang, '/dwarika-venture/')}>Dwarika Venture <Icon name="chev" class="chev" /></a>
         <div class="dropdown">
-          {ventureLinks.map((l) => <a href={u(l.href)}><img src={m(`img/${l.img}-sm.webp`)} alt="" loading="lazy" width="34" height="34" />{l.name}</a>)}
-          <a class="dd-all" href={u('/dwarika-venture/')}>All properties <Icon name="arrow" class="chev" /></a>
+          {ventureLinks.map((l) => <a href={lu(lang, l.href)}><img src={m(`img/${l.img}-sm.webp`)} alt="" loading="lazy" width="34" height="34" />{l.name}</a>)}
+          <a class="dd-all" href={lu(lang, '/dwarika-venture/')}>{t.nav.allProperties} <Icon name="arrow" class="chev" /></a>
         </div>
       </div>
-      <div class:list={['nav-item', { active: isIn('/contact') }]}><a class="nav-link" href={u('/contact/')}>Contact</a></div>
+      <div class:list={['nav-item', { active: isIn('/contact') }]}><a class="nav-link" href={lu(lang, '/contact/')}>{t.nav.contact}</a></div>
       <span class="nav-ind" aria-hidden="true"></span>
     </nav>
 
     <div class="header-cta">
-      <a class="btn btn-gold btn-sm btn-enq magnetic" href={u('/contact/#enquire')}>Enquire</a>
-      <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
+      <nav class="lang-switch" aria-label={t.common.language} data-lang-switch>
+        {LANGS.map((l) => <a href={alt[l]} hreflang={langMeta[l].html} lang={langMeta[l].html} data-lang={l} data-astro-reload aria-current={l === lang ? 'true' : undefined} title={langMeta[l].name}>{langMeta[l].label}</a>)}
+      </nav>
+      <a class="btn btn-gold btn-sm btn-enq magnetic" href={lu(lang, '/contact/#enquire')}>{t.common.enquire}</a>
+      <button class="menu-btn" type="button" aria-label={t.nav.openMenu} aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
     </div>
   </div>
 </header>
 
-<div class="mobile-menu" id="mobile-menu" transition:persist="mobile-menu">
-  <a href={u('/')}>Home</a>
-  <a href={u('/about/')}>About</a>
+<div class="mobile-menu" id="mobile-menu" transition:persist={`mobile-menu${sfx}`}>
+  <nav class="lang-switch lang-switch-menu" aria-label={t.common.language} data-lang-switch>
+    {LANGS.map((l) => <a href={alt[l]} hreflang={langMeta[l].html} lang={langMeta[l].html} data-lang={l} data-astro-reload aria-current={l === lang ? 'true' : undefined}>{langMeta[l].label}</a>)}
+  </nav>
+  <a href={lu(lang, '/')}>{t.common.home}</a>
+  <a href={lu(lang, '/about/')}>{t.nav.about}</a>
   <details>
     <summary>Dwarika Finserv</summary>
-    <a href={u('/dwarika-finserv/')}>Overview</a>
-    {loans.map((l) => <a href={u(`/dwarika-finserv/${l.slug}/`)}>{l.name}</a>)}
+    <a href={lu(lang, '/dwarika-finserv/')}>{t.nav.overview}</a>
+    {loans.map((l) => <a href={lu(lang, `/dwarika-finserv/${l.slug}/`)}>{l.name}</a>)}
   </details>
   <details>
     <summary>Dwarika Venture</summary>
-    <a href={u('/dwarika-venture/')}>Overview</a>
-    {ventureLinks.map((l) => <a href={u(l.href)}>{l.name}</a>)}
+    <a href={lu(lang, '/dwarika-venture/')}>{t.nav.overview}</a>
+    {ventureLinks.map((l) => <a href={lu(lang, l.href)}>{l.name}</a>)}
   </details>
-  <a href={u('/contact/')}>Contact</a>
+  <a href={lu(lang, '/contact/')}>{t.nav.contact}</a>
   <div class="btns">
-    <a class="btn btn-gold" href={u('/contact/#enquire')}>Enquire <Icon name="arrow" class="chev arr" /></a>
-    <a class="btn" href={waLink(`Hi ${site.finserv}, I would like to know about a loan.`, 'finserv')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> Finserv</a>
-    <a class="btn" href={waLink(`Hi ${site.venture}, I would like to know about a property.`, 'venture')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> Venture</a>
+    <a class="btn btn-gold" href={lu(lang, '/contact/#enquire')}>{t.common.enquire} <Icon name="arrow" class="chev arr" /></a>
+    <a class="btn" href={waLink(t.common.waLoan(site.finserv), 'finserv')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> Finserv</a>
+    <a class="btn" href={waLink(t.common.waProperty(site.venture), 'venture')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> Venture</a>
   </div>
 </div>

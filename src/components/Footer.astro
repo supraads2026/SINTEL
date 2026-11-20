@@ -1,22 +1,28 @@
 ---
 import Mark from './Mark.astro';
 import Icon from './Icon.astro';
-import { u } from '../lib/url';
-import { loans } from '../data/loans';
-import { propertyTypes } from '../data/property';
 import { site, telHref, waLink } from '../data/site';
+import { langFromUrl, lu, useT } from '../i18n';
+import { loansFor, propertyTypesFor } from '../i18n/data';
+const lang = langFromUrl(Astro.url);
+const t = useT(lang);
+const u = (p: string) => lu(lang, p); // links stay in the page's language (legal pages are English only)
+const loans = loansFor(lang);
+const propertyTypes = propertyTypesFor(lang);
+// The legal pages are English only: from an Odia/Hindi page, load them fully so the English header comes with them.
+const toEnglish = lang !== 'en' ? true : undefined;
 const year = new Date().getFullYear();
 const socials = Object.entries(site.social).filter(([, v]) => v);
 const iconFor: Record<string, string> = { instagram: 'ig', facebook: 'fb', linkedin: 'in', x: 'x' };
 ---
 <footer class="site-footer">
   <div class="wrap">
-    <p class="f-big"><a href={u('/contact/#enquire')}>Let's build <em>what's next.</em></a></p>
+    <p class="f-big"><a href={u('/contact/#enquire')}>{t.footer.big[0]} <em>{t.footer.big[1]}</em></a></p>
     <div class="f-grid">
       <div>
-        <a class="brand" href={u('/')} aria-label="SINTEL Enterprises home"><Mark /><span><span class="brand-word">SINTEL</span><span class="brand-sub">ENTERPRISES</span></span></a>
-        <p style="margin-top:22px">{site.addressLines.map((l) => <>{l}<br /></>)}{site.hours}</p>
-        <p>Office: <a href={telHref(site.landlineHref)}>{site.landline}</a><br />{site.finserv}: <a href={telHref(site.finservPhone)}>{site.finservPhone}</a><br />{site.venture}: <a href={telHref(site.venturePhone)}>{site.venturePhone}</a>{site.email && <><br /><a href={`mailto:${site.email}`}>{site.email}</a></>}</p>
+        <a class="brand" href={u('/')} aria-label={t.common.brandHome}><Mark /><span><span class="brand-word">SINTEL</span><span class="brand-sub">ENTERPRISES</span></span></a>
+        <p style="margin-top:22px">{site.addressLines.map((l) => <>{l}<br /></>)}{t.common.hours}</p>
+        <p>{t.footer.office}: <a href={telHref(site.landlineHref)}>{site.landline}</a><br />{site.finserv}: <a href={telHref(site.finservPhone)}>{site.finservPhone}</a><br />{site.venture}: <a href={telHref(site.venturePhone)}>{site.venturePhone}</a>{site.email && <><br /><a href={`mailto:${site.email}`}>{site.email}</a></>}</p>
         {socials.length > 0 && <div class="socials">{socials.map(([k, v]) => <a href={v} target="_blank" rel="noopener" aria-label={k}><Icon name={iconFor[k]} class="chev" /></a>)}</div>}
       </div>
       <div>
@@ -27,23 +33,23 @@ const iconFor: Record<string, string> = { instagram: 'ig', facebook: 'fb', linke
         <h2 class="f-h">Dwarika Venture</h2>
         <ul>
           {propertyTypes.map((t) => <li><a href={u(`/dwarika-venture/${t.slug}/`)}>{t.name}</a></li>)}
-          <li><a href={u('/dwarika-venture/sell-your-property/')}>Sell Your Property</a></li>
-          <li><a href={u('/dwarika-venture/buyers-guide/')}>Buyer's Guide</a></li>
+          <li><a href={u('/dwarika-venture/sell-your-property/')}>{t.nav.sellProperty}</a></li>
+          <li><a href={u('/dwarika-venture/buyers-guide/')}>{t.nav.buyersGuide}</a></li>
         </ul>
       </div>
       <div>
         <h2 class="f-h">SINTEL</h2>
         <ul>
-          <li><a href={u('/about/')}>About</a></li>
-          <li><a href={u('/contact/')}>Contact</a></li>
-          <li><a href={waLink(`Hi ${site.finserv}, I would like to know about a loan.`, 'finserv')} target="_blank" rel="noopener">WhatsApp Finserv</a></li>
-          <li><a href={waLink(`Hi ${site.venture}, I would like to know about a property.`, 'venture')} target="_blank" rel="noopener">WhatsApp Venture</a></li>
+          <li><a href={u('/about/')}>{t.nav.about}</a></li>
+          <li><a href={u('/contact/')}>{t.nav.contact}</a></li>
+          <li><a href={waLink(t.common.waLoan(site.finserv), 'finserv')} target="_blank" rel="noopener">{t.footer.waFinserv}</a></li>
+          <li><a href={waLink(t.common.waProperty(site.venture), 'venture')} target="_blank" rel="noopener">{t.footer.waVenture}</a></li>
         </ul>
       </div>
     </div>
     <div class="f-bottom">
-      <span>© {year} {site.legalName}. All rights reserved.{site.oreraAgent && <> · {site.venture}: ORERA Reg. No. {site.oreraAgent}</>}{site.cin && <> · CIN {site.cin}</>}</span>
-      <span><a href={u('/disclaimer/')}>Disclaimer</a> · <a href={u('/privacy-policy/')}>Privacy</a></span>
+      <span>© {year} {site.legalName}. {t.footer.rights}{site.oreraAgent && <> · {site.venture}: {t.footer.oreraReg} {site.oreraAgent}</>}{site.cin && <> · CIN {site.cin}</>}</span>
+      <span><a href={u('/disclaimer/')} data-astro-reload={toEnglish}>{t.footer.disclaimer}</a> · <a href={u('/privacy-policy/')} data-astro-reload={toEnglish}>{t.footer.privacy}</a>{t.footer.legalNote}</span>
     </div>
   </div>
 </footer>

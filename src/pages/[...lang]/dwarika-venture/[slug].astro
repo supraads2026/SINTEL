@@ -1,0 +1,76 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PageHero from '../../../components/PageHero.astro';
+import Icon from '../../../components/Icon.astro';
+import Faq from '../../../components/Faq.astro';
+import Related from '../../../components/Related.astro';
+import Enquiry from '../../../components/Enquiry.astro';
+import PropertyCard from '../../../components/PropertyCard.astro';
+import Disclaimer from '../../../components/Disclaimer.astro';
+import { waLink } from '../../../data/site';
+import { propertyTypes as typesEn, properties } from '../../../data/property';
+import { langPaths, lp, lu, useT, type Lang } from '../../../i18n';
+import { propertyTypesFor } from '../../../i18n/data';
+
+export function getStaticPaths() {
+  return langPaths().flatMap(({ params, props }) =>
+    typesEn.map((p) => ({ params: { ...params, slug: p.slug }, props: { ...props, slug: p.slug } })));
+}
+const { lang, slug } = Astro.props as { lang: Lang; slug: string };
+const tr = useT(lang);
+const pt = tr.ptype;
+const types = propertyTypesFor(lang);
+const t = types.find((p) => p.slug === slug)!;
+const nameEn = typesEn.find((p) => p.slug === slug)!.name; // form values stay English for SINTEL's inbox
+const list = properties.filter((p) => p.type === t.key);
+const others = types.filter((o) => o.key !== t.key);
+---
+<Base title={pt.title(t.name)} description={t.description} pageName={t.name} image={`img/${t.img}.webp`}>
+  <PageHero eyebrow="Dwarika Venture" h1={t.h1} lead={t.oneLiner} img={t.img} crumbs={[{ href: '/dwarika-venture/', name: 'Dwarika Venture' }]}>
+    <div class="btns">
+      <a class="btn btn-gold magnetic" href={list.length ? '#listings' : '#enquire'}>{list.length ? pt.seeListings : pt.getMatching} <Icon name="arrow" class="chev arr" /></a>
+      <a class="btn" href="#enquire">{pt.tellNeed}</a>
+    </div>
+  </PageHero>
+
+  <section class="section ivory" id="listings">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{pt.listings}</p><h2 data-split>{t.name}</h2><p class="lead muted">{t.intro}</p></div>
+      {list.length > 0
+        ? <div class="prop-grid">{list.map((p) => <PropertyCard p={p} />)}</div>
+        : <div class="btns"><a class="btn btn-green magnetic" href="#enquire">{pt.tellBudget} <Icon name="arrow" class="chev arr" /></a><a class="btn btn-line-dk" href={waLink(pt.waLooking(t.name), 'venture')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> {tr.common.whatsapp}</a></div>}
+    </div>
+  </section>
+
+  <section class="section dark">
+    <div class="wrap two-col">
+      <div class="sec-head"><p class="eyebrow">{pt.beforeBuy}</p><h2 data-split>{pt.lookH[0]} <em>{pt.lookH[1]}</em></h2></div>
+      <ul class="check-list">{t.lookFor.map((x) => <li data-reveal>{x}</li>)}</ul>
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap two-col">
+      <div class="sec-head"><p class="eyebrow">{tr.common.faqs}</p><h2 data-split>{pt.faqH[0]} <em>{pt.faqH[1]}</em></h2></div>
+      <Faq faqs={t.faqs} />
+    </div>
+  </section>
+
+  <section class="section green">
+    <div class="wrap two-col" style="align-items:center">
+      <div><p class="eyebrow">Dwarika Finserv</p><h2 data-split>{pt.loanH[0]} <em>{pt.loanH[1]}</em></h2></div>
+      <div><p class="lead">{pt.loanLead}</p>
+        <a class="btn btn-gold magnetic mt-2" href={lu(lang, '/dwarika-finserv/home-loan/')}>{pt.homeLoans} <Icon name="arrow" class="chev arr" /></a></div>
+    </div>
+  </section>
+
+  <section class="section ivory">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{pt.others}</p><h2 data-split>{pt.othersH[0]} <em>{pt.othersH[1]}</em></h2></div>
+      <Related items={others.map((o) => ({ href: lp(lang, `/dwarika-venture/${o.slug}/`), title: o.name, desc: o.oneLiner, img: o.img }))} />
+    </div>
+  </section>
+
+  <Enquiry interest="venture" need={`Buy: ${nameEn}`} title={pt.enquiryH(t.name)} />
+  <Disclaimer kind="venture" />
+</Base>

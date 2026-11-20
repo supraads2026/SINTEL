@@ -14,6 +14,8 @@ export interface PropertyType {
   img: string;
   description: string;
 }
+/** The translatable part of a property type (translations live in property.or.ts / property.hi.ts). */
+export type PropertyTypeText = Omit<PropertyType, 'key' | 'slug' | 'img'>;
 
 export const propertyTypes: PropertyType[] = [
   {

@@ -11,8 +11,13 @@ export default defineConfig({
   site,
   base,
   trailingSlash: 'always',
+  // English stays at the root; Odia and Hindi pages are built under /or/ and /hi/ by src/pages/[...lang]/.
+  i18n: { locales: ['en', 'or', 'hi'], defaultLocale: 'en', routing: { prefixDefaultLocale: false } },
   integrations: [
-    sitemap({ filter: (page) => !page.includes('/404') }),
+    sitemap({
+      filter: (page) => !page.includes('/404'),
+      i18n: { defaultLocale: 'en', locales: { en: 'en-IN', or: 'or-IN', hi: 'hi-IN' } },
+    }),
     {
       name: 'stable-client-filenames',
       hooks: {
@@ -21,7 +26,8 @@ export default defineConfig({
           vite.build.rollupOptions ??= {};
           const out = { ...(vite.build.rollupOptions.output || {}) };
           // Stylesheets are emitted by the server-side pass, scripts by the client pass.
-          out.assetFileNames = '_astro/[name][extname]';
+          // Pages under src/pages/[...lang]/ give chunks a "_-" prefix; drop it so names match earlier deploys.
+          out.assetFileNames = (info) => `_astro/${(info.names?.[0] ?? info.name ?? 'asset').replace(/^_-/, '')}`;
           if (target === 'client') {
             out.entryFileNames = '_astro/[name].js';
             out.chunkFileNames = '_astro/[name].js';

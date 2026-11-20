@@ -3,6 +3,8 @@
 // (src/data/site.ts → reviews, googleReviewsUrl, googleRating, googleReviewCount).
 import Icon from './Icon.astro';
 import { site, reviews } from '../data/site';
+import { langFromUrl, useT } from '../i18n';
+const t = useT(langFromUrl(Astro.url));
 interface Props { bg?: 'ivory' | 'dark' }
 const { bg = 'ivory' } = Astro.props;
 const show = reviews.length > 0 || !!site.googleReviewsUrl;
@@ -11,12 +13,12 @@ const stars = (n = 5) => '★★★★★'.slice(0, Math.round(n)) + '☆☆☆�
 {show && (
   <section class:list={['section', bg === 'dark' ? 'dark' : 'ivory', 'reviews']}>
     <div class="wrap">
-      <div class="sec-head"><p class="eyebrow">Reviews</p><h2 data-split>What our <em>customers say.</em></h2></div>
+      <div class="sec-head"><p class="eyebrow">{t.reviews.eyebrow}</p><h2 data-split>{t.reviews.h[0]} <em>{t.reviews.h[1]}</em></h2></div>
       {site.googleReviewsUrl && (
         <a class="g-rating" href={site.googleReviewsUrl} target="_blank" rel="noopener" data-track="google_reviews">
           {site.googleRating && <b>{site.googleRating}</b>}
           {site.googleRating && <span class="stars" aria-hidden="true">{stars(Number(site.googleRating))}</span>}
-          <span>{site.googleReviewCount ? `${site.googleReviewCount} reviews on Google` : 'Read our reviews on Google'}</span>
+          <span>{site.googleReviewCount ? t.reviews.count(site.googleReviewCount) : t.reviews.readGoogle}</span>
           <Icon name="arrow" class="chev arr" />
         </a>
       )}
@@ -24,7 +26,7 @@ const stars = (n = 5) => '★★★★★'.slice(0, Math.round(n)) + '☆☆☆�
         <div class="cards mt-3">
           {reviews.map((r) => (
             <figure class="card review" data-reveal>
-              <span class="stars" aria-label={`${r.rating ?? 5} out of 5`}>{stars(r.rating)}</span>
+              <span class="stars" aria-label={t.reviews.outOf5(r.rating ?? 5)}>{stars(r.rating)}</span>
               <blockquote>{r.text}</blockquote>
               <figcaption><b>{r.name}</b>{r.about && <span class="muted"> · {r.about}</span>}</figcaption>
             </figure>

@@ -9,15 +9,18 @@ interface Props {
   morph?: string; // view-transition name, shared with the card that links here
   crumbs?: { href: string; name: string }[];
 }
+import { langFromUrl, lp, useT } from '../i18n';
 const { eyebrow, h1, lead, img, wide = false, morph, crumbs = [] } = Astro.props;
+const lang = langFromUrl(Astro.url);
+const t = useT(lang);
 ---
 <section class="page-hero">
   <div class="wrap grid">
     <div>
       {crumbs.length > 0 && (
-        <nav class="crumbs" aria-label="Breadcrumb">
-          <a href={u('/')}>Home</a>
-          {crumbs.map((c) => <><span>/</span><a href={u(c.href)}>{c.name}</a></>)}
+        <nav class="crumbs" aria-label={t.common.breadcrumb}>
+          <a href={u(lp(lang, '/'))}>{t.common.home}</a>
+          {crumbs.map((c) => <><span>/</span><a href={u(lp(lang, c.href))}>{c.name}</a></>)}
         </nav>
       )}
       {eyebrow && <p class="eyebrow" data-hero-in>{eyebrow}</p>}

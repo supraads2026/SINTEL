@@ -1,9 +1,11 @@
 ---
 interface Props { kind?: 'finserv' | 'venture' }
+import { langFromUrl, useT } from '../i18n';
 const { kind = 'finserv' } = Astro.props;
+const t = useT(langFromUrl(Astro.url));
 ---
 <div class="disclaimer"><div class="wrap">
   {kind === 'finserv'
-    ? <p>Dwarika Finserv helps you find suitable loan options. Approval, interest rates and terms are decided by the lending bank or NBFC.</p>
-    : <p>Dwarika Venture helps you find and buy property. Please verify all documents and ORERA details before any payment; prices and availability can change.</p>}
+    ? <p>{t.disclaimer.finserv}</p>
+    : <p>{t.disclaimer.venture}</p>}
 </div></div>

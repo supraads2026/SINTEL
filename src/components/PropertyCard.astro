@@ -2,25 +2,29 @@
 import Icon from './Icon.astro';
 import { m, u } from '../lib/url';
 import { waLink } from '../data/site';
-import { typeByKey, type Property } from '../data/property';
+import { type Property } from '../data/property';
+import { langFromUrl, lp, useT } from '../i18n';
+import { typeByKeyFor } from '../i18n/data';
 interface Props { p: Property }
 const { p } = Astro.props;
-const t = typeByKey(p.type);
+const lang = langFromUrl(Astro.url);
+const tr = useT(lang);
+const t = typeByKeyFor(lang, p.type);
 ---
 <article class="prop-card" data-type={p.type} data-reveal>
   <div class="ph">
     <img src={m(p.photos[0])} alt={p.title} loading="lazy" width="720" height="540" />
     <span class="tag">{t.name}</span>
-    {p.sample && <span class="sample">Sample</span>}
+    {p.sample && <span class="sample">{tr.propertyCard.sample}</span>}
   </div>
   <div class="bd">
-    <h3><a href={u(`/dwarika-venture/property/${p.slug}/`)}>{p.title}</a></h3>
+    <h3><a href={u(lp(lang, `/dwarika-venture/property/${p.slug}/`))}>{p.title}</a></h3>
     <span class="meta">{p.location} · {p.area}</span>
     {p.orera && <span class="meta">ORERA: {p.orera}</span>}
     <span class="price">{p.price}</span>
   </div>
   <div class="acts">
-    <a class="btn btn-green btn-sm" href={u(`/dwarika-venture/property/${p.slug}/`)}>View <Icon name="arrow" class="chev arr" /></a>
-    <a class="btn btn-line-dk btn-sm" href={waLink(`Hi Dwarika Venture, I'm interested in ${p.title} (${p.location}).`, 'venture')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a>
+    <a class="btn btn-green btn-sm" href={u(lp(lang, `/dwarika-venture/property/${p.slug}/`))}>{tr.propertyCard.view} <Icon name="arrow" class="chev arr" /></a>
+    <a class="btn btn-line-dk btn-sm" href={waLink(tr.propertyCard.waInterested(p.title, p.location), 'venture')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a>
   </div>
 </article>

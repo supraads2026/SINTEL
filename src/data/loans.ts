@@ -20,6 +20,8 @@ export interface Loan {
   img: string;
   description: string;
 }
+/** The translatable part of a loan (translations live in loans.or.ts / loans.hi.ts). */
+export type LoanText = Omit<Loan, 'slug' | 'img' | 'rate'>;
 
 const commonFaqs: Faq[] = [
   {

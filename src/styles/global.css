@@ -579,3 +579,37 @@ main p > a[href^="tel:"], main p > a[href^="mailto:"] { display: inline-block; p
 .form-thanks .tick svg { width: 30px; height: 30px; }
 .form-thanks h3 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: .6rem; }
 .form-thanks p { color: rgba(252, 251, 246, .88); margin: 0 auto 1.2rem; max-width: 40ch; }
+
+/* ───── Languages: switcher and Odia / Hindi typography ───── */
+.lang-switch { display: flex; align-items: center; font: 600 .8rem/1 var(--sans); white-space: nowrap; }
+.lang-switch a { padding: 9px 7px; color: var(--ivory); opacity: .7; text-decoration: none; transition: opacity .3s, color .3s; }
+.lang-switch a + a { border-left: 1px solid var(--line-dk); }
+.lang-switch a:hover { opacity: 1; }
+.lang-switch a[aria-current] { opacity: 1; color: var(--gold); }
+.lang-switch a:lang(or) { font-family: 'Noto Sans Oriya', var(--sans); }
+.lang-switch a:lang(hi) { font-family: 'Noto Sans Devanagari', var(--sans); }
+.header-cta .lang-switch { margin-right: 4px; }
+.lang-switch-menu { gap: 8px; margin-bottom: 14px; font-size: 1rem; }
+.lang-switch-menu a, .lang-switch-menu a + a { border: 1px solid var(--line-dk); border-radius: 999px; padding: 10px 16px; }
+.lang-switch-menu a[aria-current] { border-color: var(--gold); }
+@media (max-width: 520px) { .header-cta .lang-switch a { padding: 9px 5px; font-size: .74rem; } }
+@media (max-width: 359px) { .header-cta .lang-switch { display: none; } }
+
+/* Odia and Devanagari: Noto fonts after Latin ones (brand names stay in Inter / Playfair), taller lines so
+   the scripts' upper and lower marks are not clipped, no letter-spacing or synthetic italics. */
+:root:lang(or) { --serif: 'Playfair Display', 'Noto Sans Oriya', Georgia, serif; --sans: 'Inter', 'Noto Sans Oriya', system-ui, sans-serif; }
+:root:lang(hi) { --serif: 'Playfair Display', 'Noto Sans Devanagari', Georgia, serif; --sans: 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif; }
+:root:is(:lang(or), :lang(hi)) :is(h1, h2, h3, h4, .statement, .hlist .t, .f-big, .mobile-menu > a, .mobile-menu summary, .faq summary, .curtain .pn) { line-height: 1.32; letter-spacing: 0; }
+:root:is(:lang(or), :lang(hi)) .line { padding-bottom: .22em; margin-bottom: -.22em; padding-top: .1em; margin-top: -.1em; }
+:root:is(:lang(or), :lang(hi)) :is(.eyebrow, .f-h, .scroll-cue, .preloader .cap, .wa-menu p, .facts span, .field label, .btn) { letter-spacing: 0; }
+:root:is(:lang(or), :lang(hi)) :is(em, .gold-i, .statement strong, .curtain .pn) { font-style: normal; }
+:root:is(:lang(or), :lang(hi)) body { line-height: 1.75; }
+:root:is(:lang(or), :lang(hi)) h1 { font-size: clamp(2rem, 6vw, 5.2rem); }
+:root:is(:lang(or), :lang(hi)) .hero-home :is(h1, .hs-h) { font-size: clamp(1.9rem, 3.3vw, 3.4rem); }
+:root:is(:lang(or), :lang(hi)) h2 { font-size: clamp(1.8rem, 4.2vw, 3.6rem); }
+:root:is(:lang(or), :lang(hi)) .hlist .t { font-size: clamp(1.4rem, 3.4vw, 2.9rem); }
+:root:is(:lang(or), :lang(hi)) .mobile-menu > a, :root:is(:lang(or), :lang(hi)) .mobile-menu summary { font-size: 1.6rem; }
+/* Longer button labels wrap instead of running off narrow screens. */
+@media (max-width: 600px) {
+  :root:is(:lang(or), :lang(hi)) .btn { white-space: normal; line-height: 1.35; text-align: left; }
+}

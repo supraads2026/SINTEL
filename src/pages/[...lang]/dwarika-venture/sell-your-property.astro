@@ -1,0 +1,78 @@
+---
+import { SHOW_TODOS } from '../../../lib/text';
+import Base from '../../../layouts/Base.astro';
+import PageHero from '../../../components/PageHero.astro';
+import Icon from '../../../components/Icon.astro';
+import Steps from '../../../components/Steps.astro';
+import Disclaimer from '../../../components/Disclaimer.astro';
+import { site, waLink } from '../../../data/site';
+import { propertyTypes as typesEn } from '../../../data/property';
+import { langPaths, langMeta, useT, type Lang } from '../../../i18n';
+import { propertyTypesFor } from '../../../i18n/data';
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const t = useT(lang);
+const s = t.sell;
+const typesL = propertyTypesFor(lang);
+const wa = waLink(s.wa, 'venture');
+---
+<Base title={s.title} description={s.description} pageName={s.pageName} image="img/img-v5-sell-property.webp">
+  <PageHero eyebrow={s.eyebrow} h1={s.h1} lead={s.lead} img="img-v5-sell-property" crumbs={[{ href: '/dwarika-venture/', name: 'Dwarika Venture' }]}>
+    <div class="btns">
+      <a class="btn btn-gold magnetic" href="#enquire">{s.list} <Icon name="arrow" class="chev arr" /></a>
+      <a class="btn" href={wa} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> {t.common.whatsapp}</a>
+    </div>
+  </PageHero>
+
+  <section class="section ivory">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">{t.common.howItWorks}</p><h2 data-split>{s.stepsH[0]} <em>{s.stepsH[1]}</em></h2></div>
+      <Steps steps={s.steps} />
+      {SHOW_TODOS && <p class="mt-3"><mark class="todo">To confirm: is the valuation / price discussion free for owners?</mark></p>}
+    </div>
+  </section>
+
+  <section class="section dark">
+    <div class="wrap two-col">
+      <div class="sec-head"><p class="eyebrow">{s.need}</p><h2 data-split>{s.needH[0]} <em>{s.needH[1]}</em></h2></div>
+      <ul class="check-list">
+        {s.needList.map((x) => <li data-reveal>{x}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section green" id="enquire">
+    <div class="wrap enquiry">
+      <div>
+        <p class="eyebrow">{s.form}</p>
+        <h2><span class="line"><span>{s.formH[0]}</span></span><span class="line"><span><em>{s.formH[1]}</em></span></span></h2>
+        <p class="lead mt-2" style="color:rgba(252,251,246,.92)">{s.formLead}</p>
+        <div class="btns mt-2"><a class="btn" href={wa} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> {s.waUs}</a></div>
+      </div>
+      <form class="form" data-enquiry novalidate>
+        <input type="hidden" name="access_key" value={site.web3formsKey} />
+        <input type="hidden" name="subject" value="New owner listing — Dwarika Venture" />
+        <input type="hidden" name="interested_in" value="Dwarika Venture (property)" />
+        <input type="hidden" name="need" value="Sell my property" />
+        {lang !== 'en' && <input type="hidden" name="language" value={langMeta[lang].wa} />}
+        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" />
+        <div class="field"><label for="s-name">{t.enquiry.name}</label><input id="s-name" name="name" required autocomplete="name" /></div>
+        <div class="field"><label for="s-mobile">{t.enquiry.mobile}</label><input id="s-mobile" name="mobile" required type="tel" inputmode="tel" autocomplete="tel" /></div>
+        <div class="field"><label for="s-type">{s.type}</label><select id="s-type" name="property_type" required><option value="" disabled selected>{t.enquiry.choose}</option>{typesEn.map((p, i) => (lang === 'en' ? <option>{p.name}</option> : <option value={p.name}>{typesL[i].name}</option>))}</select></div>
+        <div class="field"><label for="s-loc">{s.location}</label><input id="s-loc" name="location" required placeholder={s.locationPh} /></div>
+        <div class="field"><label for="s-area">{s.area}</label><input id="s-area" name="area" placeholder={s.areaPh} /></div>
+        <div class="field"><label for="s-price">{s.price}</label><input id="s-price" name="expected_price" placeholder={s.pricePh} /></div>
+        <div class="field full"><label for="s-photo">{s.photo}</label><input id="s-photo" name="photo_link" type="url" placeholder={s.photoPh} /></div>
+        <div class="field full"><label for="s-msg">{s.other}</label><textarea id="s-msg" name="message" rows="3"></textarea></div>
+        <label class="consent full"><input type="checkbox" name="consent" required /> <span>{s.consent}</span></label>
+        <div class="btns full">
+          <button class="btn btn-gold magnetic" type="submit">{s.send} <Icon name="arrow" class="chev arr" /></button>
+          <button class="btn" type="button" data-wa-send><Icon name="wa" class="chev" /> {s.sendWa}</button>
+        </div>
+        <p class="form-status full" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+  <Disclaimer kind="venture" />
+</Base>

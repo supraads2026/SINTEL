@@ -1,6 +1,10 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import { textFor } from '../i18n/client';
+
+/** Browser text in the page's language (English, Odia or Hindi). */
+const T = () => textFor(document.documentElement.lang);
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -128,6 +132,7 @@ document.addEventListener('astro:page-load', async () => {
   safe(() => initLenis());
   safe(() => initMenu());
   safe(() => setActiveNav());
+  safe(() => syncLangSwitch());
   safe(() => initNavIndicator());
   safe(() => initToTop());
   safe(() => initForms());
@@ -295,12 +300,24 @@ function initMenu() {
   const set = (open: boolean) => {
     document.body.classList.toggle('menu-open', open);
     btn.setAttribute('aria-expanded', String(open));
-    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    btn.setAttribute('aria-label', open ? T().closeMenu : T().openMenu);
     if (open) lenis?.stop(); else lenis?.start();
   };
   btn.addEventListener('click', () => set(!document.body.classList.contains('menu-open')));
   menu.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('a')) set(false); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') set(false); });
+}
+
+// The header persists across page changes, so point the language links at the new page's translations
+// (its hreflang links). English-only pages (legal) have none: those links go to that language's home page.
+function syncLangSwitch() {
+  const base = (import.meta.env.BASE_URL as string).replace(/\/$/, '');
+  const alt: Record<string, string> = {};
+  document.querySelectorAll<HTMLLinkElement>('link[rel="alternate"][hreflang]').forEach((l) => { alt[l.hreflang.slice(0, 2)] = new URL(l.href).pathname; });
+  document.querySelectorAll<HTMLAnchorElement>('[data-lang-switch] a[data-lang]').forEach((a) => {
+    const l = a.dataset.lang!;
+    a.href = alt[l] ?? (l === 'en' ? location.pathname : `${base}/${l}/`);
+  });
 }
 
 function setActiveNav() {
@@ -441,7 +458,7 @@ function initForms() {
     f.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!f.checkValidity()) { f.reportValidity(); return; }
-      say('Sending…');
+      say(T().sending);
       btn.disabled = true;
       const name = String(new FormData(f).get('name') || '').trim().split(/\s+/)[0];
       const interest = String(new FormData(f).get('interested_in') || '');
@@ -452,7 +469,7 @@ function initForms() {
         track('generate_lead', { form: 'enquiry', interest });
         showThanks(f, name);
       } else {
-        say('Sorry, that did not send. Please try again, chat on WhatsApp or call us.', 'err');
+        say(T().failed, 'err');
       }
     });
   });
@@ -464,9 +481,12 @@ function showThanks(f: HTMLFormElement, name: string) {
   panel.setAttribute('role', 'status');
   panel.tabIndex = -1;
   panel.innerHTML = `<div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-    <h3></h3><p>We have received your enquiry. Our team will call you back soon, usually within one working day.</p>
-    <button class="btn" type="button">Send another enquiry</button>`;
-  panel.querySelector('h3')!.textContent = name ? `Thank you, ${name}.` : 'Thank you.';
+    <h3></h3><p></p>
+    <button class="btn" type="button"></button>`;
+  const tx = T();
+  panel.querySelector('h3')!.textContent = name ? tx.thanksName.replace('{name}', name) : tx.thanks;
+  panel.querySelector('p')!.textContent = tx.received;
+  panel.querySelector('button')!.textContent = tx.another;
   const kids = [...f.children] as HTMLElement[];
   kids.forEach((k) => (k.hidden = true));
   f.append(panel);
@@ -483,7 +503,7 @@ function showThanks(f: HTMLFormElement, name: string) {
 function initMaps() {
   document.querySelectorAll<HTMLElement>('[data-map]').forEach((box) => {
     box.querySelector('button')?.addEventListener('click', () => {
-      box.innerHTML = `<iframe title="Map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${encodeURIComponent(box.dataset.map!)}&output=embed"></iframe>`;
+      box.innerHTML = `<iframe title="${T().map}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${encodeURIComponent(box.dataset.map!)}&output=embed"></iframe>`;
     }, { once: true });
   });
 }
@@ -608,7 +628,7 @@ function initHeroSlider() {
   pauseBtn.addEventListener('click', () => {
     paused = !paused;
     pauseBtn.setAttribute('aria-pressed', String(paused));
-    pauseBtn.setAttribute('aria-label', paused ? 'Play slideshow' : 'Pause slideshow');
+    pauseBtn.setAttribute('aria-label', paused ? T().play : T().pause);
     if (paused) stop(); else play();
   });
 

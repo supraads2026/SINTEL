@@ -1,0 +1,55 @@
+---
+import { SHOW_TODOS } from '../../../lib/text';
+import Base from '../../../layouts/Base.astro';
+import PageHero from '../../../components/PageHero.astro';
+import Icon from '../../../components/Icon.astro';
+import Enquiry from '../../../components/Enquiry.astro';
+import Disclaimer from '../../../components/Disclaimer.astro';
+import { langPaths, lu, useT, type Lang } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const g = useT(lang).guide;
+const chapters = [
+  { id: 'before', t: g.before },
+  { id: 'documents', t: g.documents },
+  { id: 'orera', t: g.orera },
+  { id: 'home-loans', t: g.homeLoans },
+  { id: 'registration', t: g.registration },
+];
+---
+<Base title={g.title} description={g.description} pageName={g.pageName} image="img/img-v6-buyers-guide.webp">
+  <PageHero eyebrow={g.eyebrow} h1={g.h1} lead={g.lead} img="img-v6-buyers-guide" crumbs={[{ href: '/dwarika-venture/', name: 'Dwarika Venture' }]} />
+
+  <section class="section ivory">
+    <div class="wrap toc-layout">
+      <nav class="toc" aria-label={g.chapters}>{chapters.map((c) => <a href={`#${c.id}`}>{c.t}</a>)}</nav>
+      <div class="prose">
+        {SHOW_TODOS && <p><mark class="todo">To confirm: SINTEL to review and approve this general guidance before launch.</mark></p>}
+
+        <h2 id="before">{g.before}</h2>
+        <ul>
+          {g.beforeList.map((x) => <li><b>{x.b}</b> {x.t}</li>)}
+        </ul>
+
+        <h2 id="documents">{g.documents}</h2>
+        <ul>
+          {g.docList.map((x) => <li><b>{x.b}</b> {x.t}</li>)}
+        </ul>
+
+        <h2 id="orera">{g.orera}</h2>
+        {g.oreraP.map((p) => <p>{p}</p>)}
+
+        <h2 id="home-loans">{g.homeLoans}</h2>
+        <p>{g.homeLoansP}</p>
+        <p><a class="link-arrow" href={lu(lang, '/dwarika-finserv/home-loan/')}>{g.homeLoansLink} <Icon name="arrow" class="chev arr" /></a></p>
+
+        <h2 id="registration">{g.registration}</h2>
+        {g.registrationP.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <Enquiry interest="venture" title={g.enquiryH} />
+  <Disclaimer kind="venture" />
+</Base>

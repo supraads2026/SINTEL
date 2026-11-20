@@ -1,11 +1,13 @@
 ---
-import { trackRecord } from '../data/site';
+import { langFromUrl, useT } from '../i18n';
 interface Props { title?: [string, string] }
-const { title = ['A track record', 'you can check.'] } = Astro.props;
+const t = useT(langFromUrl(Astro.url));
+const { title = t.track.h } = Astro.props;
+const trackRecord = t.track.items;
 ---
 <section class="section dark deep track">
   <div class="wrap">
-    <div class="sec-head"><p class="eyebrow">Track record</p><h2 data-split>{title[0]} <em>{title[1]}</em></h2></div>
+    <div class="sec-head"><p class="eyebrow">{t.track.eyebrow}</p><h2 data-split>{title[0]} <em>{title[1]}</em></h2></div>
     <ul class="track-grid">
       {trackRecord.map((r) => (
         <li data-reveal>
