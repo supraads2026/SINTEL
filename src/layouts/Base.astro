@@ -6,7 +6,7 @@ import Footer from '../components/Footer.astro';
 import WaFloat from '../components/WaFloat.astro';
 import Mark from '../components/Mark.astro';
 import Icon from '../components/Icon.astro';
-import { site } from '../data/site';
+import { site, postalAddress, sameAs } from '../data/site';
 import { m } from '../lib/url';
 
 interface Props {
@@ -28,7 +28,9 @@ const org = {
   url: new URL(import.meta.env.BASE_URL, Astro.site).href,
   logo: new URL(m('og.jpg'), Astro.site).href,
   telephone: site.landlineHref,
-  address: { '@type': 'PostalAddress', streetAddress: site.streetAddress, addressLocality: site.city, addressRegion: site.region, postalCode: site.postalCode, addressCountry: 'IN' },
+  ...(site.email ? { email: site.email } : {}),
+  ...(sameAs.length ? { sameAs } : {}),
+  address: postalAddress,
   subOrganization: [{ '@type': 'FinancialService', name: site.finserv }, { '@type': 'RealEstateAgent', name: site.venture }],
 };
 ---
@@ -63,6 +65,9 @@ const org = {
         var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         var c = navigator.connection; var slow = c && (c.saveData || /2g/.test(c.effectiveType || ''));
         if (rm || slow) d.classList.add('no-motion', 'seen');
+        // Phones skip the loading screen: the page shows straight away (faster first paint on mobile).
+        if (window.matchMedia('(max-width: 900px)').matches) d.classList.add('seen', 'phone');
+        if (c && /3g/.test(c.effectiveType || '')) d.classList.add('lite');
         if (!window.__sintelGuard) {
           window.__sintelGuard = true;
           // If the main script never starts (blocked, offline, cache mismatch), show the site
@@ -77,6 +82,16 @@ const org = {
         }
       })();
     </script>
+    {site.gscVerification && <meta name="google-site-verification" content={site.gscVerification} />}
+    {site.gaId && <>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${site.gaId}`}></script>
+      <script is:inline define:vars={{ gaId: site.gaId }}>
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { dataLayer.push(arguments); };
+        gtag('js', new Date());
+        gtag('config', gaId);
+      </script>
+    </>}
     <script type="application/ld+json" set:html={JSON.stringify([org, ...schema])} />
     <ClientRouter fallback="swap" />
   </head>

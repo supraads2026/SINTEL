@@ -375,6 +375,7 @@ mark.todo { background: rgba(201, 165, 90, .22); color: inherit; padding: 0 .3em
 .form-status.ok { color: var(--gold-lt); }
 .form-status.err { color: #ffd2c4; }
 .hp { position: absolute; left: -9999px; }
+.form > [hidden] { display: none !important; }
 @media (max-width: 560px) { .form { grid-template-columns: 1fr; } }
 
 /* ───── Disclaimer strip ───── */
@@ -528,3 +529,53 @@ main p > a[href^="tel:"], main p > a[href^="mailto:"] { display: inline-block; p
 .wa-menu a + a { margin-top: 4px; }
 .wa-menu a:hover, .wa-menu a:focus-visible { background: rgba(252, 251, 246, .08); }
 .wa-menu b { font-weight: 600; } .wa-menu span { font-size: .85rem; color: var(--muted-dk); }
+
+/* ───────── Client feedback, Nov 2026 ───────── */
+/* Contact: map header with a clear Get Directions button */
+.map-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 18px; }
+.map-head .h3 { font-size: clamp(1.4rem, 2.4vw, 2rem); margin-top: .4rem; }
+.map-head .btns { margin: 0; }
+
+/* Loan pages: eligibility · documents · rate */
+.loan-facts { display: grid; grid-template-columns: 1.1fr 1.1fr .9fr; gap: 22px; }
+.loan-facts .lf { border: 1px solid var(--line-dk); border-radius: var(--radius); padding: 28px 26px; display: flex; flex-direction: column; gap: 14px; }
+.loan-facts h3 { display: flex; align-items: center; gap: 10px; color: var(--gold-lt); font-size: 1.35rem; }
+.loan-facts h3 .chev { width: 22px; height: 22px; color: var(--gold); flex: none; }
+.loan-facts .check-list { margin: 0; }
+.loan-facts .check-list li { font-size: .95rem; }
+.loan-facts .lf-note { font-size: .82rem; margin: auto 0 0; }
+.loan-facts .lf-rate { background: rgba(201, 165, 90, .08); }
+.loan-facts .rate { font-family: var(--serif); font-size: clamp(1.8rem, 3vw, 2.4rem); color: var(--gold); margin: 0; line-height: 1.1; }
+.loan-facts .btn { align-self: flex-start; margin-top: auto; }
+@media (max-width: 1000px) { .loan-facts { grid-template-columns: 1fr; } }
+
+/* About: leadership portrait / initials and team list */
+.portrait { aspect-ratio: 4 / 5; max-width: 440px; width: 100%; border-radius: 26px; overflow: hidden; background: var(--forest); display: grid; place-items: center; }
+.portrait img { width: 100%; height: 100%; object-fit: cover; }
+.mono { font-family: var(--serif); color: var(--gold); font-size: clamp(4rem, 10vw, 7rem); letter-spacing: .04em; }
+.mono.sm { font-size: 1.4rem; width: 64px; height: 64px; border-radius: 50%; background: var(--forest); display: grid; place-items: center; flex: none; }
+.team { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.team li { display: flex; gap: 16px; align-items: center; }
+.team img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; flex: none; }
+.team li > span:last-child { display: flex; flex-direction: column; }
+
+/* Reviews + Google rating */
+.g-rating { display: inline-flex; align-items: center; gap: 12px; padding: 12px 20px; border-radius: 999px; border: 1px solid var(--line-lt); background: #fff; color: var(--ink); text-decoration: none; font-weight: 500; }
+.dark .g-rating { background: transparent; border-color: var(--line-dk); color: var(--ivory); }
+.g-rating b { font-family: var(--serif); font-size: 1.5rem; }
+.g-rating .chev { width: 18px; height: 18px; }
+.stars { color: var(--gold-dk); letter-spacing: .12em; }
+.review blockquote { margin: 14px 0 18px; font-size: 1rem; line-height: 1.6; }
+.review figcaption { font-size: .9rem; }
+
+/* Partner lender logos */
+.partner-logos { list-style: none; margin: 18px 0; padding: 0; display: flex; flex-wrap: wrap; gap: 18px 40px; align-items: center; }
+.partner-logos img { height: 44px; width: auto; filter: grayscale(1); opacity: .8; transition: filter .3s, opacity .3s; }
+.partner-logos li:hover img { filter: none; opacity: 1; }
+
+/* Enquiry: thank-you panel shown after a successful send */
+.form-thanks { grid-column: 1 / -1; text-align: center; padding: 30px 10px; }
+.form-thanks .tick { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: var(--forest); }
+.form-thanks .tick svg { width: 30px; height: 30px; }
+.form-thanks h3 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: .6rem; }
+.form-thanks p { color: rgba(252, 251, 246, .88); margin: 0 auto 1.2rem; max-width: 40ch; }

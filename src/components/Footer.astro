@@ -16,7 +16,7 @@ const iconFor: Record<string, string> = { instagram: 'ig', facebook: 'fb', linke
       <div>
         <a class="brand" href={u('/')} aria-label="SINTEL Enterprises home"><Mark /><span><span class="brand-word">SINTEL</span><span class="brand-sub">ENTERPRISES</span></span></a>
         <p style="margin-top:22px">{site.addressLines.map((l) => <>{l}<br /></>)}{site.hours}</p>
-        <p>Office: <a href={telHref(site.landlineHref)}>{site.landline}</a><br />{site.finserv}: <a href={telHref(site.finservPhone)}>{site.finservPhone}</a><br />{site.venture}: <a href={telHref(site.venturePhone)}>{site.venturePhone}</a><br /><a href={`mailto:${site.email}`}>{site.email}</a></p>
+        <p>Office: <a href={telHref(site.landlineHref)}>{site.landline}</a><br />{site.finserv}: <a href={telHref(site.finservPhone)}>{site.finservPhone}</a><br />{site.venture}: <a href={telHref(site.venturePhone)}>{site.venturePhone}</a>{site.email && <><br /><a href={`mailto:${site.email}`}>{site.email}</a></>}</p>
         {socials.length > 0 && <div class="socials">{socials.map(([k, v]) => <a href={v} target="_blank" rel="noopener" aria-label={k}><Icon name={iconFor[k]} class="chev" /></a>)}</div>}
       </div>
       <div>
@@ -42,7 +42,7 @@ const iconFor: Record<string, string> = { instagram: 'ig', facebook: 'fb', linke
       </div>
     </div>
     <div class="f-bottom">
-      <span>© {year} {site.legalName}. All rights reserved.</span>
+      <span>© {year} {site.legalName}. All rights reserved.{site.oreraAgent && <> · {site.venture}: ORERA Reg. No. {site.oreraAgent}</>}{site.cin && <> · CIN {site.cin}</>}</span>
       <span><a href={u('/disclaimer/')}>Disclaimer</a> · <a href={u('/privacy-policy/')}>Privacy</a></span>
     </div>
   </div>

@@ -98,8 +98,9 @@ export interface Property {
   sample?: boolean; // true = placeholder shown with a "Sample" badge; delete once real listings are added
 }
 
-// TODO(SINTEL): replace these samples with real listings (up to 15 at launch).
-export const properties: Property[] = [
+// TODO(SINTEL): add real listings (photo, carpet/plot area, location, price, ORERA no.).
+// Entries with sample: true are templates only: they are never published. Copy one, fill it in and remove `sample`.
+const allProperties: Property[] = [
   {
     slug: 'sample-3bhk-apartment',
     title: '3 BHK Apartment',
@@ -134,3 +135,6 @@ export const properties: Property[] = [
     sample: true,
   },
 ];
+
+/** Listings shown on the site (samples are never published). */
+export const properties: Property[] = allProperties.filter((p) => !p.sample);

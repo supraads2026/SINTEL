@@ -1,7 +1,7 @@
 ---
-import { fmt } from '../lib/text';
+import { fmt, isTodoOnly, SHOW_TODOS } from '../lib/text';
 interface Props { faqs: { q: string; a: string }[] }
-const { faqs } = Astro.props;
+const faqs = Astro.props.faqs.filter((f) => SHOW_TODOS || !isTodoOnly(f.a));
 ---
 <div class="faq">
   {faqs.map((f) => (

@@ -40,12 +40,13 @@ const needs = [
       </div>
       {img && <img src={m(`img/${img}-sm.webp`)} alt="" loading="lazy" width="720" height="402" style="margin-top:2.5rem;border-radius:20px;opacity:.95" data-parallax />}
     </div>
-    <form class="form" data-enquiry novalidate data-wa-finserv={site.finservWa} data-wa-venture={site.ventureWa}>
+    <form class="form" data-enquiry novalidate data-wa-finserv={site.finservWa} data-wa-venture={site.ventureWa} data-email={site.email}>
       <input type="hidden" name="access_key" value={site.web3formsKey} />
       <input type="hidden" name="subject" value="New website enquiry — SINTEL" />
+      <input type="hidden" name="page" value={Astro.url.pathname} />
       <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this unchecked" />
       <div class="field"><label for={`${id}-name`}>Name</label><input id={`${id}-name`} name="name" required autocomplete="name" placeholder="Your full name" /></div>
-      <div class="field"><label for={`${id}-mobile`}>Mobile</label><input id={`${id}-mobile`} name="mobile" required type="tel" inputmode="tel" autocomplete="tel" placeholder="10-digit mobile" pattern="[0-9+\s\-]{10,15}" /></div>
+      <div class="field"><label for={`${id}-mobile`}>Mobile</label><input id={`${id}-mobile`} name="mobile" required type="tel" inputmode="tel" autocomplete="tel" placeholder="10-digit mobile" pattern="[0-9+ ]{10,15}" title="10-digit mobile number" /></div>
       <div class="field"><label for={`${id}-int`}>I'm interested in</label>
         <select id={`${id}-int`} name="interested_in" required>
           <option value="" disabled selected={!interest}>Choose one</option>

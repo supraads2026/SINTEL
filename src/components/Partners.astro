@@ -1,0 +1,17 @@
+---
+// Partner bank / NBFC logos. Renders nothing until SINTEL adds lenders it has permission to show
+// (src/data/site.ts → partners; logo files in public/media/partners/).
+import { partners } from '../data/site';
+import { m } from '../lib/url';
+---
+{partners.length > 0 && (
+  <section class="section ivory partners" style="padding-top:0">
+    <div class="wrap">
+      <p class="eyebrow">Our lending partners</p>
+      <ul class="partner-logos">
+        {partners.map((p) => <li><img src={m(`partners/${p.logo}`)} alt={p.name} loading="lazy" height="48" /></li>)}
+      </ul>
+      <p class="muted" style="font-size:.85rem">Dwarika Finserv is a loan advisor and DSA, not a lender. Each lender decides approval, rates and terms.</p>
+    </div>
+  </section>
+)}

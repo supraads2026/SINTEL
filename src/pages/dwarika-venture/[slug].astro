@@ -8,6 +8,7 @@ import Enquiry from '../../components/Enquiry.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
 import Disclaimer from '../../components/Disclaimer.astro';
 import { u } from '../../lib/url';
+import { waLink } from '../../data/site';
 import { propertyTypes, properties, type PropertyType } from '../../data/property';
 
 export function getStaticPaths() {
@@ -20,7 +21,7 @@ const others = propertyTypes.filter((o) => o.key !== t.key);
 <Base title={`${t.name} for Sale in Bhubaneswar | Dwarika Venture`} description={t.description} pageName={t.name} image={`img/${t.img}.webp`}>
   <PageHero eyebrow="Dwarika Venture" h1={t.h1} lead={t.oneLiner} img={t.img} crumbs={[{ href: '/dwarika-venture/', name: 'Dwarika Venture' }]}>
     <div class="btns">
-      <a class="btn btn-gold magnetic" href="#listings">See listings <Icon name="arrow" class="chev arr" /></a>
+      <a class="btn btn-gold magnetic" href={list.length ? '#listings' : '#enquire'}>{list.length ? 'See listings' : 'Get matching properties'} <Icon name="arrow" class="chev arr" /></a>
       <a class="btn" href="#enquire">Tell us your need</a>
     </div>
   </PageHero>
@@ -30,7 +31,7 @@ const others = propertyTypes.filter((o) => o.key !== t.key);
       <div class="sec-head"><p class="eyebrow">Listings</p><h2 data-split>{t.name}</h2><p class="lead muted">{t.intro}</p></div>
       {list.length > 0
         ? <div class="prop-grid">{list.map((p) => <PropertyCard p={p} />)}</div>
-        : <p class="empty">New listings coming soon. Tell us what you're looking for and we'll call you when something fits.</p>}
+        : <div class="btns"><a class="btn btn-green magnetic" href="#enquire">Tell us your budget and area <Icon name="arrow" class="chev arr" /></a><a class="btn btn-line-dk" href={waLink(`Hi Dwarika Venture, I'm looking for ${t.name.toLowerCase()}. Area / budget:`, 'venture')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a></div>}
     </div>
   </section>
 

@@ -1,4 +1,5 @@
 ---
+import { SHOW_TODOS } from '../lib/text';
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import { site } from '../data/site';
@@ -6,7 +7,7 @@ import { site } from '../data/site';
 <Base title="Privacy Policy" description="How SINTEL Enterprises collects and uses the information you share through this website." pageName="Privacy">
   <PageHero h1={['Privacy', 'policy.']} />
   <section class="section ivory"><div class="wrap prose">
-    <p><mark class="todo">To confirm: SINTEL to review this policy (ideally with legal advice) before launch.</mark></p>
+    {SHOW_TODOS && <p><mark class="todo">To confirm: SINTEL to review this policy (ideally with legal advice) before launch.</mark></p>}
     <h2>What we collect</h2>
     <p>When you send an enquiry, we collect the details you choose to share: your name, mobile number, what you are interested in and your message. If you contact us on WhatsApp, WhatsApp's own privacy policy also applies.</p>
     <h2>How we use it</h2>

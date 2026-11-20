@@ -4,7 +4,12 @@ import Icon from '../components/Icon.astro';
 import Enquiry from '../components/Enquiry.astro';
 import TrackRecord from '../components/TrackRecord.astro';
 import { m, u } from '../lib/url';
-import { site } from '../data/site';
+import Reviews from '../components/Reviews.astro';
+import Partners from '../components/Partners.astro';
+import { site, team } from '../data/site';
+import { SHOW_TODOS } from '../lib/text';
+const initials = (n: string) => n.split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join('');
+const [lead, ...rest] = team;
 const values = [
   { icon: 'shield', t: 'Trust', d: 'We earn it slowly and protect it carefully.' },
   { icon: 'eye', t: 'Transparency', d: 'Clear options, clear costs, no surprises.' },
@@ -32,8 +37,8 @@ const values = [
         <h2 data-split>Rooted in <em>Bhubaneswar.</em></h2>
       </div>
       <div class="lead">
-        <p>Our journey in loans and property began in 2008. Today {site.legalName} is Odisha's first PAN-India corporate DSA (Direct Selling Agent), and we have served our customers from the same office on Lewis Road for the last 11 years.</p>
-        <p>We take the trust our customers place in us seriously: no funding we have arranged for our customers has defaulted since 2015, and we have a clean record with no compliance issues.</p>
+        <p>Our journey in loans and property began in 2008. Today {site.legalName} works as a PAN-India corporate DSA (Direct Selling Agent) from Odisha, and we have served our customers from the same office on Lewis Road for the last 11 years.</p>
+        <p>We take the trust our customers place in us seriously. We look closely at every application, so that the loans we help arrange are ones our customers can comfortably repay, and we follow lender and regulatory rules carefully.</p>
         <p>{site.legalName} brings two specialist companies under one roof: {site.finserv}, which helps people and businesses find the right loan, and {site.venture}, which helps them buy and sell property. From our office on Lewis Road, we work with families and businesses across Bhubaneswar and Odisha.</p>
       </div>
     </div>
@@ -47,21 +52,33 @@ const values = [
         <div data-reveal><p class="eyebrow">Vision</p><p class="statement" style="font-size:clamp(1.6rem,3vw,2.6rem)">To be Odisha's most trusted name in <strong>finance and property.</strong></p></div>
         <div data-reveal><p class="eyebrow">Mission</p><p class="statement" style="font-size:clamp(1.6rem,3vw,2.6rem)">Clear, honest guidance for every <strong>loan</strong> and every <strong>property decision.</strong></p></div>
       </div>
-      <p class="mt-3"><mark class="todo">To confirm: vision and mission wording</mark></p>
+      {SHOW_TODOS && <p class="mt-3"><mark class="todo">To confirm: vision and mission wording</mark></p>}
     </div>
   </section>
 
   <section class="section ivory">
     <div class="wrap two-col" style="align-items:center">
-      <div class="art" data-reveal style="aspect-ratio:4/5;border-radius:26px;overflow:hidden;background:var(--forest);display:grid;place-items:center;color:var(--gold);max-width:440px">
-        <!-- TODO(SINTEL): replace with the photo of Ashok Kumar Sahoo (public/media/img/ashok-kumar-sahoo.webp) -->
-        <div style="text-align:center;padding:30px"><Icon name="eye" class="icon" /><p style="margin-top:14px;color:var(--muted-dk)">Leadership photo<br />coming soon</p></div>
+      <div class="portrait" data-reveal>
+        {lead.photo
+          ? <img src={m(`team/${lead.photo}`)} alt={`${lead.name}, ${lead.role}`} width="600" height="750" loading="lazy" />
+          : <span class="mono" aria-hidden="true">{initials(lead.name)}</span>}
       </div>
       <div>
         <p class="eyebrow">Leadership</p>
-        <h2 data-split>{site.founder}</h2>
-        <p class="lead muted mt-2">{site.founderRole} <mark class="todo">To confirm</mark></p>
-        <p class="muted"><mark class="todo">To confirm: a short note from {site.founder}.</mark></p>
+        <h2 data-split>{lead.name}</h2>
+        <p class="lead muted mt-2">{lead.role}, {site.legalName}</p>
+        <p class="muted">{lead.bio || `${lead.name} leads ${site.group} and its two companies, ${site.finserv} and ${site.venture}, from the Lewis Road office in Bhubaneswar, where the group has worked in loans and property since 2008.`}</p>
+        {SHOW_TODOS && !lead.photo && <p><mark class="todo">To confirm: photo, designation and a short note</mark></p>}
+        {rest.length > 0 && (
+          <ul class="team mt-3">
+            {rest.map((t) => (
+              <li>
+                {t.photo ? <img src={m(`team/${t.photo}`)} alt="" width="96" height="96" loading="lazy" /> : <span class="mono sm" aria-hidden="true">{initials(t.name)}</span>}
+                <span><b>{t.name}</b><span class="muted">{t.role}</span>{t.bio && <span class="muted">{t.bio}</span>}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   </section>
@@ -87,6 +104,9 @@ const values = [
       <div class="cards">{values.map((v) => <div class="card" data-reveal><span class="icon"><Icon name={v.icon} /></span><h3>{v.t}</h3><p>{v.d}</p></div>)}</div>
     </div>
   </section>
+
+  <Reviews />
+  <Partners />
 
   <Enquiry title={["Let's", 'talk.']} />
 </Base>

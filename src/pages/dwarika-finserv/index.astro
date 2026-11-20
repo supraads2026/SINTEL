@@ -4,11 +4,12 @@ import Icon from '../../components/Icon.astro';
 import HoverList from '../../components/HoverList.astro';
 import Steps from '../../components/Steps.astro';
 import Faq from '../../components/Faq.astro';
+import Partners from '../../components/Partners.astro';
 import Enquiry from '../../components/Enquiry.astro';
 import Disclaimer from '../../components/Disclaimer.astro';
 import { m } from '../../lib/url';
 import { loans } from '../../data/loans';
-import { site } from '../../data/site';
+import { site, postalAddress } from '../../data/site';
 
 const docs = [
   { icon: 'shield', t: 'Identity & address proof', d: 'PAN, Aadhaar and a current address proof for every applicant.' },
@@ -16,10 +17,10 @@ const docs = [
   { icon: 'layers', t: 'Bank statements', d: 'Usually the last 6 to 12 months for your main accounts.' },
   { icon: 'home', t: 'Property papers', d: 'For secured loans: title deed, RoR / mutation, approved plan and tax receipts.' },
 ];
-const schema = [{ '@context': 'https://schema.org', '@type': 'FinancialService', name: site.finserv, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', telephone: site.finservPhone.replace(/\s/g, ''),
+const schema = [{ '@context': 'https://schema.org', '@type': 'FinancialService', name: site.finserv, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', address: postalAddress, url: new URL(Astro.url.pathname, Astro.site).href, telephone: site.finservPhone.replace(/\s/g, ''),
   hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Loans', itemListElement: loans.map((l) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: l.name } })) } }];
 ---
-<Base title="Dwarika Finserv | Loans & Funding in Bhubaneswar" description="Dwarika Finserv helps individuals and businesses in Bhubaneswar find suitable personal, business, home and property-backed loans, explained simply." pageName="Dwarika Finserv" schema={schema}>
+<Base title="Loans in Bhubaneswar: Personal, Home & Business | Dwarika Finserv" description="Dwarika Finserv helps individuals and businesses in Bhubaneswar find suitable personal, business, home and property-backed loans, explained simply." pageName="Dwarika Finserv" schema={schema}>
   <section class="hero" aria-label="Dwarika Finserv">
     <div class="hero-media">
       <div class="stage">
@@ -73,6 +74,8 @@ const schema = [{ '@context': 'https://schema.org', '@type': 'FinancialService',
       ]} />
     </div>
   </section>
+
+  <Partners />
 
   <Enquiry interest="finserv" title={['Talk to a', 'loan expert.']} />
   <Disclaimer />

@@ -17,7 +17,7 @@ const { loan } = Astro.props as { loan: Loan };
 const i = loans.indexOf(loan);
 const related = [1, 2, 3].map((k) => loans[(i + k) % loans.length]);
 const schema = [
-  { '@context': 'https://schema.org', '@type': 'Service', name: loan.name, serviceType: 'Loan advisory', provider: { '@type': 'FinancialService', name: site.finserv }, areaServed: 'Bhubaneswar, Odisha', description: loan.oneLiner },
+  { '@context': 'https://schema.org', '@type': 'Service', name: `${loan.name} in Bhubaneswar`, serviceType: 'Loan advisory', provider: { '@type': 'FinancialService', name: site.finserv }, areaServed: 'Bhubaneswar, Odisha', description: loan.oneLiner },
   { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: loan.faqs.filter((f) => !f.a.includes('TODO')).map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
 ];
 ---
@@ -43,10 +43,33 @@ const schema = [
     </div>
   </section>
 
-  <section class="section dark">
-    <div class="wrap two-col">
-      <div class="sec-head"><p class="eyebrow">Documents</p><h2 data-split>Usually <em>needed.</em></h2><p class="muted">The final list depends on the lender.</p></div>
-      <ul class="check-list">{loan.docs.map((d) => <li data-reveal>{d}</li>)}</ul>
+  <section class="section dark" id="eligibility">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Eligibility, documents &amp; rates</p><h2 data-split>Before you <em>apply.</em></h2></div>
+      <div class="loan-facts">
+        <div class="lf" data-reveal>
+          <h3><Icon name="shield" class="chev" /> Eligibility</h3>
+          <ul class="check-list">{loan.eligibility.map((e) => <li>{e}</li>)}</ul>
+          <p class="muted lf-note">Most lenders look for the above. Each lender sets its own final criteria.</p>
+        </div>
+        <div class="lf" data-reveal>
+          <h3><Icon name="doc" class="chev" /> Documents needed</h3>
+          <ul class="check-list">{loan.docs.map((d) => <li>{d}</li>)}</ul>
+          <p class="muted lf-note">The final list depends on the lender.</p>
+        </div>
+        <div class="lf lf-rate" data-reveal>
+          <h3><Icon name="growth" class="chev" /> Interest rate</h3>
+          {loan.rate ? (
+            <>
+              <p class="rate">{loan.rate}</p>
+              <p class="muted">Indicative range across our partner banks and NBFCs. Your rate depends on your income, credit score, loan amount and the lender's policy.</p>
+            </>
+          ) : (
+            <p class="muted">Rates are set by the lending bank or NBFC and depend on your income, credit score, loan amount and tenure. We compare current rates from several lenders for you.</p>
+          )}
+          <a class="btn btn-gold btn-sm mt-1" href={waLink(`Hi Dwarika Finserv, what are today's interest rates for a ${loan.name}?`, 'finserv')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> Ask for today's rates</a>
+        </div>
+      </div>
     </div>
   </section>
 

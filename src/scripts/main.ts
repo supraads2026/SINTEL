@@ -38,11 +38,11 @@ function runPreloader(): Promise<void> {
     };
     const tick = () => { count.textContent = String(Math.round(state.v)).padStart(2, '0'); bar.style.transform = `scaleX(${state.v / 100})`; };
     // Count to ~80 while loading, then to 100 once the page has loaded
-    const t1 = gsap.to(state, { v: 82, duration: 1.0, ease: 'power2.out', onUpdate: tick });
-    const done = () => { t1.kill(); gsap.to(state, { v: 100, duration: 0.4, ease: 'power2.inOut', onUpdate: tick, onComplete: finish }); };
-    const minTime = new Promise((r) => setTimeout(r, 700));
+    const t1 = gsap.to(state, { v: 82, duration: 0.6, ease: 'power2.out', onUpdate: tick });
+    const done = () => { t1.kill(); gsap.to(state, { v: 100, duration: 0.25, ease: 'power2.inOut', onUpdate: tick, onComplete: finish }); };
+    const minTime = new Promise((r) => setTimeout(r, 450));
     const fonts = (document as any).fonts?.ready ?? Promise.resolve();
-    Promise.all([minTime, Promise.race([fonts, new Promise((r) => setTimeout(r, 1800))])]).then(done);
+    Promise.all([minTime, Promise.race([fonts, new Promise((r) => setTimeout(r, 900))])]).then(done);
   });
 }
 
@@ -345,7 +345,7 @@ function initToTop() {
 // ───────────────── Video ─────────────────
 function initHeroVideos() {
   document.querySelectorAll<HTMLVideoElement>('video[data-hero-video]').forEach((v) => {
-    if (!motion()) { v.remove(); return; }
+    if (!motion() || root.classList.contains('lite')) { v.remove(); return; }
     whenIdle(() => {
     v.preload = 'auto';
     v.play().then(() => v.previousElementSibling?.classList.contains('poster') && gsap.to(v.previousElementSibling, { opacity: 0, duration: 0.6, delay: 0.3 })).catch(() => {});
@@ -356,8 +356,12 @@ function initHeroVideos() {
   });
 }
 
+const isPhone = () => root.classList.contains('phone');
+// Videos start only after the page has fully loaded and gone quiet; on phones, 2.5 s later still,
+// so the first screen (text + poster image) is never competing with a video download.
 function whenIdle(fn: () => void) {
-  const go = () => ('requestIdleCallback' in window ? (window as any).requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 200));
+  const idle = () => ('requestIdleCallback' in window ? (window as any).requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 200));
+  const go = () => (isPhone() ? setTimeout(idle, 2500) : idle());
   if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
 }
 
@@ -365,7 +369,7 @@ function initScrub(on: boolean) {
   const sec = document.querySelector<HTMLElement>('[data-scrub]');
   if (!sec) return;
   const v = sec.querySelector('video')!;
-  if (!on) { v.remove(); return; }
+  if (!on || isPhone() || root.classList.contains('lite')) { v.remove(); return; }
   v.preload = 'auto';
   v.load();
   const setup = () => {
@@ -391,7 +395,7 @@ function formToText(f: HTMLFormElement) {
     d.get('mobile') && `Mobile: ${d.get('mobile')}`,
     d.get('interested_in') && `Interested in: ${d.get('interested_in')}`,
     d.get('need') && `Need: ${d.get('need')}`,
-    ...[...d.entries()].filter(([k]) => !['access_key', 'subject', 'botcheck', 'name', 'mobile', 'interested_in', 'need', 'message', 'consent'].includes(k)).map(([k, v]) => v && `${k.replace(/_/g, ' ')}: ${v}`),
+    ...[...d.entries()].filter(([k]) => !['access_key', 'subject', 'botcheck', 'name', 'mobile', 'interested_in', 'need', 'message', 'consent', 'page'].includes(k)).map(([k, v]) => v && `${k.replace(/_/g, ' ')}: ${v}`),
     d.get('message') && `Message: ${d.get('message')}`,
   ].filter(Boolean);
   return lines.join('\n');
@@ -399,35 +403,80 @@ function formToText(f: HTMLFormElement) {
 // Venture enquiries go to Dwarika Venture's WhatsApp, everything else to Dwarika Finserv's.
 const waNumber = (f: HTMLFormElement) => (/venture/i.test(String(new FormData(f).get('interested_in') || '')) ? f.dataset.waVenture : f.dataset.waFinserv);
 
+// Sends the enquiry by email. Web3Forms when an access key is set; otherwise FormSubmit straight to
+// SINTEL's address (FormSubmit emails that address once to activate the form before it delivers).
+async function sendEnquiry(f: HTMLFormElement): Promise<boolean> {
+  const d = new FormData(f);
+  if (d.get('botcheck')) return true; // spam bot: pretend it worked
+  const key = String(d.get('access_key') || '').trim();
+  if (key) {
+    const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { Accept: 'application/json' }, body: d });
+    const j = await res.json().catch(() => ({}));
+    return res.ok && !!j.success;
+  }
+  const to = f.dataset.email;
+  if (!to) return false;
+  const body: Record<string, string> = {};
+  d.forEach((v, k) => { if (!['access_key', 'botcheck', 'subject'].includes(k)) body[k] = String(v); });
+  body.consent = body.consent ? 'Yes' : 'No';
+  body._subject = `New enquiry: ${body.interested_in || 'SINTEL website'}${body.need ? ` · ${body.need}` : ''}`;
+  body._template = 'table';
+  body._captcha = 'false';
+  const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body),
+  });
+  const j = await res.json().catch(() => ({}));
+  return res.ok && String(j.success) === 'true';
+}
+
 function initForms() {
   document.querySelectorAll<HTMLFormElement>('form[data-enquiry]').forEach((f) => {
     if (f.dataset.bound) return;
     f.dataset.bound = '1';
     const status = f.querySelector<HTMLElement>('.form-status')!;
+    const btn = f.querySelector<HTMLButtonElement>('button[type=submit]')!;
     const say = (t: string, cls = '') => { status.textContent = t; status.className = `form-status full ${cls}`; };
-    f.querySelector('[data-wa-send]')?.addEventListener('click', () => {
-      window.open(`https://wa.me/${waNumber(f)}?text=${encodeURIComponent(formToText(f))}`, '_blank', 'noopener');
-    });
+    const openWa = () => window.open(`https://wa.me/${waNumber(f)}?text=${encodeURIComponent(formToText(f))}`, '_blank', 'noopener');
+    f.querySelector('[data-wa-send]')?.addEventListener('click', () => { track('whatsapp_click', { location: 'enquiry_form' }); openWa(); });
     f.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!f.checkValidity()) { f.reportValidity(); return; }
-      const key = (f.querySelector<HTMLInputElement>('[name=access_key]')!.value || '').trim();
-      if (!key) {
-        // No email service configured yet: send the enquiry on WhatsApp instead.
-        window.open(`https://wa.me/${waNumber(f)}?text=${encodeURIComponent(formToText(f))}`, '_blank', 'noopener');
-        say('Opening WhatsApp with your enquiry…', 'ok');
-        return;
-      }
       say('Sending…');
-      try {
-        const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(f) });
-        const j = await res.json();
-        if (j.success) { f.reset(); say('Thank you. We have your enquiry and will call you back soon.', 'ok'); }
-        else throw new Error(j.message);
-      } catch {
-        say('Sorry, that did not send. Please try WhatsApp or call us.', 'err');
+      btn.disabled = true;
+      const name = String(new FormData(f).get('name') || '').trim().split(/\s+/)[0];
+      const interest = String(new FormData(f).get('interested_in') || '');
+      let ok = false;
+      try { ok = await sendEnquiry(f); } catch { ok = false; }
+      btn.disabled = false;
+      if (ok) {
+        track('generate_lead', { form: 'enquiry', interest });
+        showThanks(f, name);
+      } else {
+        say('Sorry, that did not send. Please try again, chat on WhatsApp or call us.', 'err');
       }
     });
+  });
+}
+
+function showThanks(f: HTMLFormElement, name: string) {
+  const panel = document.createElement('div');
+  panel.className = 'form-thanks';
+  panel.setAttribute('role', 'status');
+  panel.tabIndex = -1;
+  panel.innerHTML = `<div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h3></h3><p>We have received your enquiry. Our team will call you back soon, usually within one working day.</p>
+    <button class="btn" type="button">Send another enquiry</button>`;
+  panel.querySelector('h3')!.textContent = name ? `Thank you, ${name}.` : 'Thank you.';
+  const kids = [...f.children] as HTMLElement[];
+  kids.forEach((k) => (k.hidden = true));
+  f.append(panel);
+  panel.focus({ preventScroll: true });
+  panel.querySelector('button')!.addEventListener('click', () => {
+    f.reset();
+    panel.remove();
+    kids.forEach((k) => (k.hidden = false));
+    const st = f.querySelector<HTMLElement>('.form-status');
+    if (st) st.textContent = '';
   });
 }
 
@@ -477,7 +526,7 @@ function initHeroSlider() {
   const pauseBtn = hero.querySelector<HTMLButtonElement>('.hs-pause')!;
   const shimmer = hero.querySelector<HTMLElement>('.hs-shimmer');
   const n = media.length;
-  const animate = motion();
+  const animate = motion() && !root.classList.contains('lite');
   const small = window.matchMedia('(max-width: 900px)').matches;
   let cur = 0, paused = false, inView = true, busy = false, started = false;
   let raf = 0, timer = 0;
@@ -583,6 +632,28 @@ function initHeroSlider() {
     media.forEach((_, i) => vid(i).pause());
   });
 }
+
+// ───────────────── Analytics (Google Analytics 4, only when an ID is set in site.ts) ─────────────────
+function track(event: string, params: Record<string, unknown> = {}) {
+  const g = (window as any).gtag;
+  if (typeof g === 'function') g('event', event, params);
+}
+// One listener for the whole visit: WhatsApp, call, email and directions clicks anywhere on the site.
+document.addEventListener('click', (e) => {
+  const a = (e.target as HTMLElement).closest?.('a') as HTMLAnchorElement | null;
+  if (!a) return;
+  const href = a.getAttribute('href') || '';
+  const where = a.closest('.wa-float, .wa-menu') ? 'floating_button'
+    : a.closest('.site-footer') ? 'footer'
+    : a.closest('.hero, .page-hero') ? 'hero'
+    : a.closest('.prop-card') ? 'property_card'
+    : 'page';
+  const company = /918926150261/.test(href) ? 'finserv' : /919776852555/.test(href) ? 'venture' : /919337705030/.test(href) ? 'director' : undefined;
+  if (/wa\.me\//.test(href)) track('whatsapp_click', { location: where, company, page_path: location.pathname });
+  else if (href.startsWith('tel:')) track('phone_click', { location: where, number: href.slice(4), page_path: location.pathname });
+  else if (href.startsWith('mailto:')) track('email_click', { location: where, page_path: location.pathname });
+  else if (a.dataset.track) track(a.dataset.track, { location: where, page_path: location.pathname });
+}, { capture: true });
 
 // WhatsApp chooser (shared pages): close when clicking elsewhere or after picking a company.
 document.addEventListener('click', (e) => {

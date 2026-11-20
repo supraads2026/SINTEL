@@ -8,17 +8,17 @@ import PropertyCard from '../../components/PropertyCard.astro';
 import Disclaimer from '../../components/Disclaimer.astro';
 import { m, u } from '../../lib/url';
 import { propertyTypes, properties } from '../../data/property';
-import { site } from '../../data/site';
+import { site, waLink, postalAddress } from '../../data/site';
 
 const why = [
   { icon: 'shield', t: 'Verified documents', d: 'We check title, approvals and ORERA details before we list.' },
   { icon: 'eye', t: 'Site visits arranged', d: 'See the property in person at a time that suits you.' },
   { icon: 'key', t: 'Home-loan help', d: 'Dwarika Finserv can help you fund the purchase.' },
-  { icon: 'handshake', t: 'Guidance till registration', d: 'We stay with you through booking and registration. TODO(SINTEL): confirm' },
+  { icon: 'handshake', t: 'Guidance till registration', d: 'We stay with you through booking and registration.' },
 ];
-const schema = [{ '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: site.venture, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', telephone: site.venturePhone.replace(/\s/g, '') }];
+const schema = [{ '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: site.venture, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', address: postalAddress, url: new URL(Astro.url.pathname, Astro.site).href, telephone: site.venturePhone.replace(/\s/g, '') }];
 ---
-<Base title="Dwarika Venture | Property for Sale in Bhubaneswar" description="Flats, villas, plots and commercial property for sale in and around Bhubaneswar, with honest advice from Dwarika Venture." pageName="Dwarika Venture" schema={schema}>
+<Base title="Property in Bhubaneswar: Flats, Villas & Plots for Sale | Dwarika Venture" description="Flats, villas, plots and commercial property for sale in and around Bhubaneswar, with honest advice from Dwarika Venture." pageName="Dwarika Venture" schema={schema}>
   <section class="hero" aria-label="Dwarika Venture">
     <div class="hero-media">
       <div class="stage">
@@ -31,7 +31,7 @@ const schema = [{ '@context': 'https://schema.org', '@type': 'RealEstateAgent', 
       <h1><span class="line"><span>Find the right</span></span><span class="line"><span><em>property.</em></span></span></h1>
       <p class="lead" data-hero-in>Flats, villas, plots and commercial spaces in and around Bhubaneswar, with honest advice.</p>
       <div class="btns" data-hero-in>
-        <a class="btn btn-gold magnetic" href="#listings">Explore properties <Icon name="arrow" class="chev arr" /></a>
+        <a class="btn btn-gold magnetic" href="#listings">{properties.length ? 'Explore properties' : 'Find a property'} <Icon name="arrow" class="chev arr" /></a>
         <a class="btn magnetic" href={u('/dwarika-venture/sell-your-property/')}>Sell your property <Icon name="arrow" class="chev arr" /></a>
       </div>
     </div>
@@ -47,13 +47,27 @@ const schema = [{ '@context': 'https://schema.org', '@type': 'RealEstateAgent', 
 
   <section class="section ivory" id="listings">
     <div class="wrap">
-      <div class="sec-head"><p class="eyebrow">Featured properties</p><h2 data-split>On the <em>market.</em></h2></div>
-      <div class="chips" data-filters="#all-props" style="margin-bottom:32px">
-        <button class="chip" data-k="all" aria-pressed="true">All</button>
-        {propertyTypes.map((t) => <button class="chip" data-k={t.key} aria-pressed="false">{t.name.split(' ')[0].replace('&', '')}</button>)}
-      </div>
-      <div class="prop-grid" id="all-props">{properties.map((p) => <PropertyCard p={p} />)}</div>
-      {properties.length === 0 && <p class="empty">New listings coming soon. Tell us what you're looking for below.</p>}
+      {properties.length > 0 ? (
+        <>
+          <div class="sec-head"><p class="eyebrow">Featured properties</p><h2 data-split>On the <em>market.</em></h2></div>
+          <div class="chips" data-filters="#all-props" style="margin-bottom:32px">
+            <button class="chip" data-k="all" aria-pressed="true">All</button>
+            {propertyTypes.map((t) => <button class="chip" data-k={t.key} aria-pressed="false">{t.name.split(' ')[0].replace('&', '')}</button>)}
+          </div>
+          <div class="prop-grid" id="all-props">{properties.map((p) => <PropertyCard p={p} />)}</div>
+        </>
+      ) : (
+        <div class="two-col" style="align-items:center">
+          <div class="sec-head" style="margin:0"><p class="eyebrow">Properties</p><h2 data-split>Tell us what <em>you need.</em></h2></div>
+          <div>
+            <p class="lead muted">Our current listings change quickly, so we share them directly. Tell us the type of property, area and budget, and we'll send you options that fit, with the documents checked.</p>
+            <div class="btns mt-2">
+              <a class="btn btn-green magnetic" href="#enquire">Send your requirement <Icon name="arrow" class="chev arr" /></a>
+              <a class="btn btn-line-dk" href={waLink("Hi Dwarika Venture, I'm looking for a property. Type / area / budget:", 'venture')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> WhatsApp</a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   </section>
 

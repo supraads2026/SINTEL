@@ -5,7 +5,10 @@ import Icon from '../components/Icon.astro';
 import Enquiry from '../components/Enquiry.astro';
 import { m } from '../lib/url';
 import { site, telHref, waLink } from '../data/site';
-const schema = [{ '@context': 'https://schema.org', '@type': 'LocalBusiness', name: site.legalName, telephone: site.landlineHref, email: site.email,
+const schema = [{ '@context': 'https://schema.org', '@type': 'LocalBusiness', name: site.legalName, telephone: site.landlineHref, ...(site.email ? { email: site.email } : {}),
+  url: new URL(import.meta.env.BASE_URL, Astro.site).href, hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapQuery)}`,
+  openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], opens: '10:00', closes: '18:00' }],
+  areaServed: 'Bhubaneswar, Odisha',
   address: { '@type': 'PostalAddress', streetAddress: site.streetAddress, addressLocality: site.city, addressRegion: site.region, postalCode: site.postalCode, addressCountry: 'IN' },
   image: new URL(m('og.jpg'), Astro.site).href }];
 const companies = [
@@ -14,12 +17,14 @@ const companies = [
 ];
 const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.mapQuery)}&z=17&output=embed`;
 const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapQuery)}`;
+const directionsLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(site.mapQuery)}`;
 ---
 <Base title="Contact SINTEL Enterprises | Lewis Road, Bhubaneswar" description="Contact SINTEL Enterprises, Dwarika Finserv and Dwarika Venture at Plot No. 433/5174, Lewis Road, Nageswar Tangi, Bhubaneswar 751002. Call, WhatsApp or send an enquiry." pageName="Contact" schema={schema}>
   <PageHero eyebrow="Contact" h1={["Let's", 'talk.']} lead="Call, WhatsApp or send an enquiry. We'll get back to you soon." img="img-07-contact-pin" wide>
     <div class="btns">
       <a class="btn btn-gold magnetic" href="#enquire">Send an enquiry <Icon name="arrow" class="chev arr" /></a>
       <a class="btn" href={telHref(site.landlineHref)}><Icon name="phone" class="chev" /> {site.landline}</a>
+      <a class="btn" href="#map"><Icon name="pin" class="chev" /> Get Directions</a>
     </div>
   </PageHero>
 
@@ -31,13 +36,13 @@ const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
           <span class="icon"><Icon name="pin" /></span>
           <h3>Office</h3>
           <p>{site.addressLines.map((l) => <>{l}<br /></>)}</p>
-          <p class="mt-1"><a class="link-arrow" href={mapsLink} target="_blank" rel="noopener">Get directions <Icon name="arrow" class="chev arr" /></a></p>
+          <p class="mt-1"><a class="link-arrow" href={directionsLink} target="_blank" rel="noopener" data-track="directions">Get directions <Icon name="arrow" class="chev arr" /></a></p>
         </div>
         <div class="card" data-reveal>
           <span class="icon"><Icon name="phone" /></span>
           <h3>Office landline</h3>
           <p><a href={telHref(site.landlineHref)}>{site.landline}</a></p>
-          <p class="muted">{site.hours} <mark class="todo">To confirm</mark></p>
+          <p class="muted">{site.hours}</p>
         </div>
         {companies.map((c) => (
           <div class="card" data-reveal>
@@ -55,14 +60,25 @@ const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
           <p><a href={telHref(site.directorPhone)}>{site.directorPhone}</a></p>
           <p class="mt-1"><a class="link-arrow" href={`https://wa.me/${site.directorWa}`} target="_blank" rel="noopener">WhatsApp <Icon name="arrow" class="chev arr" /></a></p>
         </div>
-        <div class="card" data-reveal>
-          <span class="icon"><Icon name="mail" /></span>
-          <h3>Email</h3>
-          <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
-          {site.email.includes('example') && <p style="margin-top:8px"><mark class="todo">To confirm</mark></p>}
+        {site.email && (
+          <div class="card" data-reveal>
+            <span class="icon"><Icon name="mail" /></span>
+            <h3>Email</h3>
+            <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+          </div>
+        )}
+      </div>
+      <div class="map-head mt-3" id="map">
+        <div>
+          <p class="eyebrow">Find us</p>
+          <h2 class="h3">Lewis Road, in front of the IFFCO office</h2>
+        </div>
+        <div class="btns">
+          <a class="btn btn-gold magnetic" href={directionsLink} target="_blank" rel="noopener" data-track="directions"><Icon name="pin" class="chev" /> Get Directions</a>
+          <a class="btn btn-line-dk" href={mapsLink} target="_blank" rel="noopener">Open in Google Maps</a>
         </div>
       </div>
-      <div class="map-embed mt-3">
+      <div class="map-embed mt-2">
         <iframe title={`Map: ${site.legalName}, Lewis Road, Bhubaneswar`} src={mapSrc} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
       </div>
     </div>

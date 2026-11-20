@@ -21,7 +21,8 @@ export const site = {
   directorWa: '919337705030',
   landline: '0674 297 2530', // office landline
   landlineHref: '+916742972530',
-  email: 'info@example.com', // TODO(SINTEL): email address for enquiries
+  // Enquiry email. Leave empty to hide it everywhere (never show a placeholder address on the live site).
+  email: 'connect@sintelenterprise.com',
   streetAddress: 'Plot No. 433/5174, Lewis Road, In front of IFFCO Office, Nageswar Tangi, BJB Nagar',
   addressLines: ['Plot No. 433/5174, Lewis Road', 'In front of IFFCO Office, Nageswar Tangi', 'BJB Nagar, Bhubaneswar, Odisha 751002'],
   postalCode: '751002',
@@ -29,6 +30,18 @@ export const site = {
   region: 'Odisha',
   hours: 'Mon – Sat · 10:00 am – 6:00 pm', // TODO(SINTEL): confirm office hours
   mapQuery: 'Plot No 433, 5174, Lewis Road, Infront of Iffco Office, Nageswar Tangi, BJB Nagar, Bhubaneswar, Odisha 751002',
+
+  // Registrations shown in the footer when filled in. Leave empty to hide.
+  // Dwarika Venture sells property as an agent, so ORERA (Odisha RERA) agent registration usually applies.
+  oreraAgent: '', // TODO(SINTEL): ORERA agent registration number, e.g. "ORERA/AG/2024/0123"
+  cin: '', // optional: company CIN
+
+  // Google: Business Profile reviews link, Analytics 4 ID, Search Console verification code. Empty = off.
+  googleReviewsUrl: '', // TODO(SINTEL): "Share profile" / review link from Google Business Profile
+  googleRating: '', // e.g. '4.8' — only fill in the real rating shown on Google
+  googleReviewCount: '', // e.g. '62'
+  gaId: '', // TODO(SINTEL): Google Analytics 4 measurement ID, e.g. "G-XXXXXXXXXX"
+  gscVerification: '', // Google Search Console "HTML tag" content value
 
   // Forms: free key from https://web3forms.com (enter SINTEL's email there). Empty = WhatsApp only.
   web3formsKey: '', // TODO(SINTEL): add the Web3Forms access key
@@ -42,6 +55,13 @@ export const site = {
   },
 };
 
+/** schema.org address used by every LocalBusiness block (helps "loan / property in Bhubaneswar" local search). */
+export const postalAddress = {
+  '@type': 'PostalAddress', streetAddress: site.streetAddress, addressLocality: site.city,
+  addressRegion: site.region, postalCode: site.postalCode, addressCountry: 'IN',
+};
+export const sameAs = [site.googleReviewsUrl, ...Object.values(site.social)].filter(Boolean);
+
 export type Company = 'finserv' | 'venture';
 export const waNumberFor = (co: Company) => (co === 'venture' ? site.ventureWa : site.finservWa);
 export const phoneFor = (co: Company) => (co === 'venture' ? site.venturePhone : site.finservPhone);
@@ -49,11 +69,26 @@ export const telHref = (phone: string) => `tel:${phone.replace(/\s/g, '')}`;
 export const waLink = (text: string, co: Company) =>
   `https://wa.me/${waNumberFor(co)}?text=${encodeURIComponent(text)}`;
 
-// Track record, as supplied by SINTEL (Nov 2026).
+// Track record. Only claims that a visitor can check or that SINTEL can document.
+// The stronger lines SINTEL supplied ("Odisha's 1st PAN-India corporate DSA", "0 defaults since 2015",
+// "0 compliance issues") are softened until there is proof to link to (a lender letter, certificate, etc.).
 export const trackRecord = [
-  { v: '1st', t: 'PAN-India corporate DSA from Odisha', d: "Odisha's first PAN-India corporate DSA (Direct Selling Agent)." },
   { v: '2008', t: 'In loans and property since', d: 'Over 18 years of experience in loans and property.' },
   { v: '11 yrs', t: 'At the same office', d: 'On Lewis Road, Bhubaneswar, for the last 11 years.' },
-  { v: '0', t: 'Defaults since 2015', d: 'No funding arranged for our customers has defaulted since 2015.' },
-  { v: '0', t: 'Compliance issues', d: 'A clean record, with no compliance issues.' },
+  { v: 'PAN-India', t: 'Corporate DSA', d: 'A corporate DSA (Direct Selling Agent) working with lenders across India, from Odisha.' },
+  { v: '7', t: 'Loan solutions', d: 'From personal loans to project funding and working capital.' },
+  { v: '2', t: 'Companies, one team', d: 'Dwarika Finserv for loans, Dwarika Venture for property.' },
+];
+
+// Customer reviews: copy real reviews from Google (with the reviewer's first name as shown there). Empty = section hidden.
+export const reviews: { name: string; text: string; rating?: number; about?: string }[] = [];
+
+// Partner banks / NBFCs: only add a lender once SINTEL has its written permission to show the logo.
+// logo = file in public/media/partners/ (SVG or PNG, transparent background).
+export const partners: { name: string; logo: string }[] = [];
+
+// Leadership & team. photo = file in public/media/team/ (square WebP, ~600 px). Empty photo = initials.
+export const team: { name: string; role: string; photo?: string; bio?: string }[] = [
+  // TODO(SINTEL): confirm designation and add photo + a 2–3 line intro
+  { name: 'Ashok Kumar Sahoo', role: 'Founder & Director', photo: '', bio: '' },
 ];

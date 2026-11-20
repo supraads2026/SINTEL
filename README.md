@@ -27,21 +27,25 @@ npm run build      # static site in dist/
 
 | What | File |
 |---|---|
-| Phone, WhatsApp, email, address, hours, social links, Web3Forms key | `src/data/site.ts` |
-| Loan pages (copy, documents, FAQs) | `src/data/loans.ts` |
+| Phone, WhatsApp, email, address, hours, social links, Web3Forms key, ORERA no., Google reviews link, GA4 ID, Search Console code | `src/data/site.ts` |
+| Track record, reviews, partner logos, team | `src/data/site.ts` (each section stays hidden while its list is empty) |
+| Loan pages (copy, eligibility, documents, rate range, FAQs) | `src/data/loans.ts` |
 | Property types and **property listings** | `src/data/property.ts` |
 | Page layouts | `src/pages/` |
 | Colours, type, spacing | `src/styles/global.css` (tokens at the top) |
 | Motion (preloader, curtain, reveals, hover images, scroll-scrub) | `src/scripts/main.ts` |
 | Images / videos | `public/media/` |
 
-**Placeholders:** anything still to come from SINTEL is marked `TODO(SINTEL)` in the code and shows on the page as a dashed gold "To confirm" label. Search the project for `TODO(SINTEL)` to find them all.
+**Placeholders:** anything still to come from SINTEL is marked `TODO(SINTEL)` in the code. The dashed gold "To confirm" labels show only on the dev server (`npm run dev`), never in the live build. Search the project for `TODO(SINTEL)` to find them all.
 
 ### Adding a property
-Put the photos in `public/media/properties/` (WebP, about 1600 px wide), then add an entry to `properties` in `src/data/property.ts`. Delete the three `sample: true` entries once real listings exist.
+Put the photos in `public/media/properties/` (WebP, about 1600 px wide), then add an entry to `allProperties` in `src/data/property.ts`. Entries with `sample: true` are templates and are never published; while there are no real listings, the property sections show a "tell us your budget" panel instead.
 
 ### Enquiry forms
-Forms send to email through [Web3Forms](https://web3forms.com) (free). Create an access key with SINTEL's email and paste it into `web3formsKey` in `src/data/site.ts`. Until then, "Send enquiry" opens WhatsApp with the form details pre-filled.
+Forms email each enquiry to `site.email` and then show a "Thank you" panel. With no Web3Forms key they use [FormSubmit](https://formsubmit.co) (no account): the **first** enquiry triggers an activation email to that address, and someone must click its link once before enquiries are delivered. To use [Web3Forms](https://web3forms.com) instead, create an access key for the same address and paste it into `web3formsKey`. If sending fails, the visitor is asked to WhatsApp or call.
+
+### Analytics
+Set `gaId` in `src/data/site.ts` to the GA4 measurement ID. Events sent: `whatsapp_click` (with `company` and `location`), `phone_click`, `email_click`, `directions`, `generate_lead` (enquiry sent). In GA4, mark `whatsapp_click` and `generate_lead` as key events.
 
 ## Deploying (GitHub Pages)
 
@@ -55,10 +59,11 @@ Forms send to email through [Web3Forms](https://web3forms.com) (free). Create an
 Note: on a free GitHub plan, Pages needs the repository to be **public**.
 
 ## Stability rules
-- Hero videos are muted MP4s under 3 MB with a poster shown first; they pause when off-screen.
+- Hero videos are muted MP4s with a poster shown first; they pause when off-screen. Phone versions (`*-m.mp4`, 854×480) are 100–275 KB each and start 2.5 s after the page loads.
+- Phones skip the loading screen and the About-page scroll video; 3G connections get posters only.
 - Reduced-motion users and data-saver / 2G connections get posters and simple layouts: no preloader, smooth scroll or video.
 - The About tower video has every frame as a keyframe so scroll-scrubbing is smooth in both directions.
 - Below-the-fold images lazy-load.
 
 ## Still needed from SINTEL
-Logo files (SVG / high-res PNG) · domain name · full office address, email and hours · About text · photo and designation of Ashok Kumar Sahoo · loan FAQ answers (fees, timelines, partner banks) · property listings with photos and ORERA numbers · confirmation of the Sell Your Property process and Buyer's Guide text.
+ORERA agent number · Google Business Profile link and rating · GA4 ID · partner lender logos (with permission) · real reviews · indicative rate ranges per loan · logo files (SVG / high-res PNG) · domain name · full office address, email and hours · About text · photo and designation of Ashok Kumar Sahoo · loan FAQ answers (fees, timelines, partner banks) · property listings with photos and ORERA numbers · confirmation of the Sell Your Property process and Buyer's Guide text.

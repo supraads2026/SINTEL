@@ -5,10 +5,12 @@ import HoverList from '../components/HoverList.astro';
 import Steps from '../components/Steps.astro';
 import Enquiry from '../components/Enquiry.astro';
 import TrackRecord from '../components/TrackRecord.astro';
+import Reviews from '../components/Reviews.astro';
 import PropertyCard from '../components/PropertyCard.astro';
 import { u, m } from '../lib/url';
 import { loans } from '../data/loans';
 import { properties } from '../data/property';
+import { waLink } from '../data/site';
 
 const statement = 'SINTEL Enterprises brings loans and property under one trusted group in Bhubaneswar, so a family buying a home or a business planning its next step can find the funding <strong>and</strong> the property in one place.';
 const why = [
@@ -141,8 +143,20 @@ const slides = [
         <p class="eyebrow">Dwarika Venture</p>
         <h2 data-split>Find the right <em>property.</em></h2>
       </div>
-      <div class="prop-grid">{featured.map((p) => <PropertyCard p={p} />)}</div>
-      <div class="btns mt-3"><a class="btn btn-green magnetic" href={u('/dwarika-venture/')}>View all properties <Icon name="arrow" class="chev arr" /></a></div>
+      {featured.length > 0 ? (
+        <>
+          <div class="prop-grid">{featured.map((p) => <PropertyCard p={p} />)}</div>
+          <div class="btns mt-3"><a class="btn btn-green magnetic" href={u('/dwarika-venture/')}>View all properties <Icon name="arrow" class="chev arr" /></a></div>
+        </>
+      ) : (
+        <>
+          <p class="lead muted" style="max-width:46ch">Flats, villas, plots and commercial property in and around Bhubaneswar. Tell us your budget and area, and we'll share properties that fit.</p>
+          <div class="btns mt-2">
+            <a class="btn btn-green magnetic" href={u('/dwarika-venture/')}>Explore Dwarika Venture <Icon name="arrow" class="chev arr" /></a>
+            <a class="btn btn-line-dk" href={waLink("Hi Dwarika Venture, I'm looking for a property. My budget and area:", 'venture')} target="_blank" rel="noopener"><Icon name="wa" class="chev" /> Ask on WhatsApp</a>
+          </div>
+        </>
+      )}
     </div>
   </section>
 
@@ -183,6 +197,8 @@ const slides = [
 
   <!-- 7b · Track record -->
   <TrackRecord />
+
+  <Reviews />
 
   <!-- 8 · Enquiry -->
   <Enquiry img="img-04-sintel-towers" />
