@@ -33,7 +33,7 @@ export const site = {
 
   // Registrations shown in the footer when filled in. Leave empty to hide.
   // Dwarika Venture sells property as an agent, so ORERA (Odisha RERA) agent registration usually applies.
-  oreraAgent: '', // TODO(SINTEL): ORERA agent registration number, e.g. "ORERA/AG/2024/0123"
+  oreraAgent: 'ORA/0410/2026', // Dwarika Venture, ORERA real-estate agent certificate valid 31-08-2026 to 30-08-2029 (renew before expiry)
   cin: '', // optional: company CIN
 
   // Google: Business Profile reviews link, Analytics 4 ID, Search Console verification code. Empty = off.

@@ -1,11 +1,12 @@
 ---
 interface Props { kind?: 'finserv' | 'venture' }
 import { langFromUrl, useT } from '../i18n';
+import { site } from '../data/site';
 const { kind = 'finserv' } = Astro.props;
 const t = useT(langFromUrl(Astro.url));
 ---
 <div class="disclaimer"><div class="wrap">
   {kind === 'finserv'
     ? <p>{t.disclaimer.finserv}</p>
-    : <p>{t.disclaimer.venture}</p>}
+    : <p>{t.disclaimer.venture}{site.oreraAgent && ` ${site.venture}: ${t.footer.oreraReg} ${site.oreraAgent}.`}</p>}
 </div></div>

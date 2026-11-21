@@ -48,7 +48,7 @@ const iconFor: Record<string, string> = { instagram: 'ig', facebook: 'fb', linke
       </div>
     </div>
     <div class="f-bottom">
-      <span>© {year} {site.legalName}. {t.footer.rights}{site.oreraAgent && <> · {site.venture}: {t.footer.oreraReg} {site.oreraAgent}</>}{site.cin && <> · CIN {site.cin}</>}</span>
+      <span>© {year} {site.legalName}. {t.footer.rights}{site.oreraAgent && ` · ${site.venture}: ${t.footer.oreraReg} ${site.oreraAgent}`}{site.cin && <> · CIN {site.cin}</>}</span>
       <span><a href={u('/disclaimer/')} data-astro-reload={toEnglish}>{t.footer.disclaimer}</a> · <a href={u('/privacy-policy/')} data-astro-reload={toEnglish}>{t.footer.privacy}</a>{t.footer.legalNote}</span>
     </div>
   </div>

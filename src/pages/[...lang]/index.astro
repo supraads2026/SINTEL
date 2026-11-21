@@ -9,7 +9,7 @@ import Reviews from '../../components/Reviews.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
 import { m } from '../../lib/url';
 import { properties } from '../../data/property';
-import { waLink } from '../../data/site';
+import { site, waLink } from '../../data/site';
 import { langPaths, lp, lu, useT, type Lang } from '../../i18n';
 import { loansFor } from '../../i18n/data';
 
@@ -24,6 +24,9 @@ const statement = h.statement;
 const whyIcons = ['layers', 'chat', 'pin', 'phone'];
 const why = h.why.map((w, i) => ({ icon: whyIcons[i], ...w }));
 const featured = properties.slice(0, 3);
+const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.mapQuery)}&z=16&output=embed`;
+const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapQuery)}`;
+const directionsLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(site.mapQuery)}`;
 
 // Rotating hero: one 8-second video per slide, in story order (group → finance → bridge → property → brand).
 // Every word is live HTML; the videos carry no text.
@@ -197,6 +200,26 @@ const slides = media.map((s, i) => ({
   <TrackRecord />
 
   <Reviews />
+
+  <!-- 7c · Find us -->
+  <section class="section ivory" id="map">
+    <div class="wrap">
+      <div class="map-head">
+        <div>
+          <p class="eyebrow">{t.contact.findUs}</p>
+          <h2 class="h3">{t.contact.findUsH}</h2>
+          <p class="muted mt-1">{site.addressLines.join(', ')} · {t.common.hours}</p>
+        </div>
+        <div class="btns">
+          <a class="btn btn-gold magnetic" href={directionsLink} target="_blank" rel="noopener" data-track="directions"><Icon name="pin" class="chev" /> {t.contact.getDirections}</a>
+          <a class="btn btn-line-dk" href={mapsLink} target="_blank" rel="noopener">{t.contact.openMaps}</a>
+        </div>
+      </div>
+      <div class="map-embed mt-2">
+        <iframe title={t.contact.mapTitle(site.legalName)} src={mapSrc} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
 
   <!-- 8 · Enquiry -->
   <Enquiry img="img-04-sintel-towers" />

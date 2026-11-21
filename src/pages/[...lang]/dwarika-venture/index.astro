@@ -26,7 +26,8 @@ const guideCards = [
   { icon: 'shield', h: '#orera' },
   { icon: 'compass', h: '#registration' },
 ].map((c, i) => ({ ...c, ...v.guideCards[i] }));
-const schema = [{ '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: site.venture, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', address: postalAddress, url: new URL(Astro.url.pathname, Astro.site).href, telephone: site.venturePhone.replace(/\s/g, '') }];
+const schema = [{ '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: site.venture, parentOrganization: site.legalName, areaServed: 'Bhubaneswar, Odisha', address: postalAddress, url: new URL(Astro.url.pathname, Astro.site).href, telephone: site.venturePhone.replace(/\s/g, ''),
+  ...(site.oreraAgent ? { identifier: { '@type': 'PropertyValue', propertyID: 'ORERA real estate agent registration', value: site.oreraAgent } } : {}) }];
 ---
 <Base title={v.title} description={v.description} pageName="Dwarika Venture" schema={schema}>
   <section class="hero" aria-label="Dwarika Venture">
